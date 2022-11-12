@@ -79,7 +79,7 @@ function export.fetch_all()
             contents, code = async_https.request("https://thunderstore.io/c/"..id.."/api/v1/package/")
             if not contents or code ~= 200 then error("Could not get package list for community \""..id.."\"! Error code: "..code) end
             local packages = common.array_to_map(json.decode(contents), function (x) return x["full_name"] end)
-
+ 
             local pkg_path = path.join(export.package_dir, id..".lua")
             local f, reason = io.open(pkg_path, "w+b")
             if not f then error("Could not create file at "..path.."\nReason: "..reason) end
@@ -88,7 +88,7 @@ function export.fetch_all()
 
             f:close()
             i[1] = i[1] + 1
-            print(string.format("Got info for community \"%s\"! (%d/%d)", id, i[1], i[2]))
+            print(string.format("Got package list for community \"%s\" (%d/%d)", id, i[1], i[2]))
         end, v, i)
     end
 

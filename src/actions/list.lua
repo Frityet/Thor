@@ -14,7 +14,7 @@ function export.configure_command(cmd)
         default = "communities"
     }
 
-    local scope = cmd:argument {
+    cmd:argument {
         name = "scope",
         choices = {
             "categories",
@@ -86,7 +86,7 @@ function export.on_run(arg)
 
                 for _, author in ipairs(xauthor) do if pkg["owner"]:lower():find(author:lower()) then goto next end end
 
-                print(pkgid)
+                print(pkg["name"])
 
                 ::next::
             end
