@@ -1,5 +1,5 @@
 local thunderstore = require("thor.thunderstore")
-local common       = require("thor.common")
+local common       = require("common")
 local app          = require("pl.app")
 local dir          = require("pl.dir")
 local path         = require("pl.path")
