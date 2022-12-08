@@ -4,10 +4,10 @@
 
 ---@type { [string] : Action }
 local actions = {
-    list = require("actions.list"),
-    update = require("actions.update"),
-    info = require("actions.info"),
-    profile = require("actions.profile")
+    list    = require("thor.actions.list"),
+    update  = require("thor.actions.update"),
+    info    = require("thor.actions.info"),
+    profile = require("thor.actions.profile")
 }
 
 return actions

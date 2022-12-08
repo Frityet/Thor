@@ -1,10 +1,7 @@
---TODO: Need better alternative! https://github.com/actboy168/lua-debug/issues/202
-package.cpath = "/Users/frityet/Documents/Thor/lua_modules/lib/lua/5.1/?.so;/usr/local/lib/lua/5.1/?.so"
-
-local pretty = require("pl.pretty")
-local argparse = require("argparse")
-local thunderstore = require("thunderstore")
-local actions = require("actions")
+local pretty        = require("pl.pretty")
+local argparse      = require("argparse")
+local thunderstore  = require("thor.thunderstore")
+local actions       = require("thor.actions")
 
 local lprint, lerror = print, error
 

@@ -1,5 +1,5 @@
-local thunderstore = require("thunderstore")
-local common = require("common")
+local thunderstore  = require("thor.thunderstore")
+local common        = require("thor.common")
 
 ---@type Action
 local export = {}
