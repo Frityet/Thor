@@ -1,6 +1,0 @@
-name = "Autogen"
-files = {
-    "*.lua"
-}
-
-
