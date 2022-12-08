@@ -75,13 +75,13 @@ function export.on_run(arg)
 
                 for _, cat in ipairs(cats) do
                     local ok = false
-                    for _, v in ipairs(pkg["categories"] --[[@as string[] ]]) do if v:lower():find(cat:lower()) then ok = true; break end end
+                    for _, v in ipairs(pkg["categories"]) do if v:lower():find(cat:lower()) then ok = true; break end end
 
                     if not ok then goto next end
                 end
 
                 for _, cat in ipairs(xcats) do
-                    for _, v in ipairs(pkg["categories"] --[[@as string[] ]]) do if v:lower():find(cat:lower()) then goto next end end
+                    for _, v in ipairs(pkg["categories"]) do if v:lower():find(cat:lower()) then goto next end end
                 end
 
                 for _, author in ipairs(xauthor) do if pkg["owner"]:lower():find(author:lower()) then goto next end end

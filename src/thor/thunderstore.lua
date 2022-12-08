@@ -11,11 +11,12 @@ local path          = require("pl.path")
 local common        = require("thor.common")
 
 local export = {
-    ---@type { [string] : Community }
+    ---@type { [CommunityIdentifier] : Community }
     communities = {
         ---@class Community
         [""] = {
             name = "",
+            ---@type CommunityIdentifier
             identifier = "",
 
             ---@type string?
@@ -27,6 +28,7 @@ local export = {
             ---@type {[string] : { name: string, slug: string }}
             categories = {},
 
+            ---@type {[string] : Package, ["database"]: { [string]: Package }}
             packages = {}
         }
     },
@@ -51,12 +53,6 @@ local function getpackage(self, idx)
 
     if idx == "database" then return rawget(self, "database") end
     return self.database[idx]
-end
-
-local function getallpackages(self)
-    print("Paring")
-    getpackage(self, "")
-    return next, self.database, nil
 end
 
 function export.fetch_all()
@@ -113,7 +109,6 @@ do
         v.packages = setmetatable({}, {
             _file = path.join(export.package_directory, k..".lua"),
             __index = getpackage,
-            __pairs = getallpackages
         })
     end
 end

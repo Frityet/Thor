@@ -26,12 +26,7 @@ function export.on_run(arg)
         thunderstore.fetch_all()
         print("\x1b[32mDone\x1B[0m")
     else
-        local communities = arg["community"]
-        if not communities then
-        
-        else
-            
-        end
+        error("Not implemented!")
     end
 end
 

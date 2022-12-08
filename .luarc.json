@@ -6,12 +6,12 @@
         "lua_modules/share/lua/5.1/?/init.lua"
     ],
     "runtime.version": "LuaJIT",
-    "workspace.useGitIgnore": false,
+    "workspace.useGitIgnore": true,
     "diagnostics.groupSeverity": {
         "ambiguity": "Error",
         "await": "Error",
         "codestyle": "Error",
-        "duplicate": "Error",
+        "duplicate": "Hint",
         "global": "Error",
         "luadoc": "Error",
         "redefined": "Error",
@@ -20,5 +20,13 @@
         "type-check": "Error",
         "unbalanced": "Error",
         "unused": "Hint"
-    }
+    },
+    "workspace.ignoreDir": [
+        ".vscode",
+        "lua_modules/share/lua/5.1/thor"
+    ],
+    "workspace.library": [
+        "autogen/"
+    ],
+    
 }

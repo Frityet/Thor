@@ -1,0 +1,6 @@
+name = "Autogen"
+files = {
+    "*.lua"
+}
+
+
