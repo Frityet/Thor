@@ -1,7 +1,4 @@
 {
-    "Lua.diagnostics.globals": [
-        "lfs"
-    ],
     "diagnostics.groupSeverity": {
         "ambiguity": "Error",
         "await": "Error",
@@ -20,19 +17,27 @@
         "src/?.lua",
         "src/?/init.lua",
         "lua_modules/share/lua/5.1/?.lua",
-        "lua_modules/share/lua/5.1/?/init.lua"
+        "lua_modules/share/lua/5.1/?/init.lua",
+        "lua_modules/lib/lua/5.1/?.so"
     ],
+    "runtime.pathStrict": true,
     "runtime.version": "LuaJIT",
     "workspace.ignoreDir": [
         ".vscode",
-        "lua_modules/share/lua/5.1/thor"
+        "${workspaceDir}/lua_modules/share/lua/5.1/thor"
     ],
     "workspace.ignoreSubmodules": false,
     "workspace.library": [
         "types/thor/",
-        "types/pl/",
-        "types/argparse/",
-        "${3rd}/lfs/library"
+        "types/pl/library",
+        "types/argparse/library",
+        "${3rd}/lfs/library",
+        "lua_modules/share/lua/5.1/",
+        "lua_modules/lib/lua/5.1/"
+
     ],
-    "workspace.useGitIgnore": false
+    "workspace.useGitIgnore": false,
+    "diagnostics.disableScheme": [
+        "*.rockspec"
+    ]
 }

@@ -1,4 +1,3 @@
----@diagnostic disable: lowercase-global
 package = "Thor"
 version = "dev-1"
 source = {

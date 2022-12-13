@@ -10,6 +10,7 @@ local path          = require("pl.path")
 
 local common        = require("common")
 
+
 local export = {
     ---@type { [CommunityIdentifier] : Community }
     communities = {
