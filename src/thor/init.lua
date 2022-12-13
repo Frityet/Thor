@@ -1,12 +1,12 @@
 local pretty        = require("pl.pretty")
 local argparse      = require("argparse")
-local thunderstore  = require("thor.thunderstore")
+local thunderstore  = require("thunderstore")
 local actions       = require("thor.actions")
 
 local lprint, lerror = print, error
 
--- ---Regular print can't print tables, and pprint has quotations around strings, so this is the best solution
--- ---@param ... any
+---Regular print can't print tables, and pprint has quotations around strings, so this is the best solution
+---@param ... any
 function print(...)
     local a = {...}
     if #a < 1 then return

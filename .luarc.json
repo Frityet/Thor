@@ -1,12 +1,7 @@
 {
-    "runtime.path": [
-        "src/?.lua",
-        "src/?/init.lua",
-        "lua_modules/share/lua/5.1/?.lua",
-        "lua_modules/share/lua/5.1/?/init.lua"
+    "Lua.diagnostics.globals": [
+        "lfs"
     ],
-    "runtime.version": "LuaJIT",
-    "workspace.useGitIgnore": false,
     "diagnostics.groupSeverity": {
         "ambiguity": "Error",
         "await": "Error",
@@ -21,12 +16,23 @@
         "unbalanced": "Error",
         "unused": "Hint"
     },
+    "runtime.path": [
+        "src/?.lua",
+        "src/?/init.lua",
+        "lua_modules/share/lua/5.1/?.lua",
+        "lua_modules/share/lua/5.1/?/init.lua"
+    ],
+    "runtime.version": "LuaJIT",
     "workspace.ignoreDir": [
         ".vscode",
         "lua_modules/share/lua/5.1/thor"
     ],
+    "workspace.ignoreSubmodules": false,
     "workspace.library": [
-        "types/"
-    ]
-    
+        "types/thor/",
+        "types/pl/",
+        "types/argparse/",
+        "${3rd}/lfs/library"
+    ],
+    "workspace.useGitIgnore": false
 }

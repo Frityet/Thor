@@ -27,9 +27,9 @@ build = {
     modules = {
         ["json"]                            = "src/json.lua",
         ["common"]                          = "src/common.lua",
+        ["thunderstore"]                    = "src/thunderstore.lua",
 
         --#region thor  
-        ["thor.thunderstore"]               = "src/thor/thunderstore.lua",
 
         ["thor.actions"]                    = "src/thor/actions/init.lua",
         ["thor.actions.update"]             = "src/thor/actions/update.lua",

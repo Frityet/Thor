@@ -61,38 +61,41 @@ function export.fetch_all()
 
     export.communities = common.array_to_map(json.decode(body)["results"],"identifier")
 
-    
 
-    local i = { 0, #common.getkeys(export.communities) }
+    local l, i = #common.getkeys(export.communities), 0
     --Get all of the community lists and package lists async
     for _, v in pairs(export.communities) do
         ---@param community Community
-        copas.addthread(function (community)
+        copas.addthread(function (community, index, keyc)
             local id = community.identifier
             local contents, code = async_https.request("https://h3vr.thunderstore.io/api/experimental/community/"..id.."/category/")
             if not contents or code ~= 200 then error("Could not get category for community \""..id.."\"! Error code: "..code) end
+
+            --Map the key to the `slug`, with the value just being the decoded table value
             community.categories = common.array_to_map(json.decode(contents)["results"], "slug")
 
             contents, code = async_https.request("https://thunderstore.io/c/"..id.."/api/v1/package/")
-            if not contents or code ~= 200 then error("Could not get package list for community \""..id.."\"! Error code: "..code) end
+             if not contents or code ~= 200 then error("Could not get package list for community \""..id.."\"! Error code: "..code) end
+
+            --Same thing, but with `full_name` instead of `slug`
             local packages = common.array_to_map(json.decode(contents), "full_name")
- 
-            local pkg_path = path.join(export.package_directory, id..".luac")
+
+            local pkg_path = path.join(export.package_directory, id..".lua")
             local f, reason = io.open(pkg_path, "w+b")
             if not f then error("Could not create file at "..path.."\nReason: "..reason) end
 
-            f:write("return ", pretty.write(packages))
+            --This is a bad IDEA!
+            --TODO: Replace with actual binary serialization
+            f:write("return ", pretty.write(packages, "", true))
 
             f:close()
-            i[1] = i[1] + 1
-            print(string.format("Got package list for community \"%s\" (%d/%d)", id, i[1], i[2]))
-        end, v, i)
+            print(string.format("Got package list for community \"%s\" (%d/%d)", id, index, keyc))
+        end, v, i, l)
+        i = i + 1
     end
 
     --Run the async loop
     copas()
-
-
 end
 
 do
@@ -101,7 +104,7 @@ do
         print("Community registry not found, creating...")
         export.fetch_all()
         
-        file.write(community_path, "return "..pretty.write(export.communities))
+        file.write(community_path, "return "..pretty.write(export.communities, "", true))
 
         print("Wrote community registry to "..community_path)
     else
@@ -110,7 +113,7 @@ do
 
     for k, v in pairs(export.communities) do
         v.packages = setmetatable({}, {
-            _file = path.join(export.package_directory, k..".luac"),
+            _file = path.join(export.package_directory, k..".lua"),
             __index = getpackage,
         })
     end

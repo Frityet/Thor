@@ -6,9 +6,9 @@
 
 package.path = package.path..";./lua_modules/share/lua/5.1/?.lua;./lua_modules/share/lua/5.1/?/init.lua"
 
-local thunderstore = require("thor.thunderstore")
+local thunderstore = require("thunderstore")
 
-local typef = assert(io.open("types/types.lua", "w+"))
+local typef = assert(io.open("types/thor/types.lua", "w+"))
 
 --#region Community identifiers
 typef:write("---@meta\n\n")

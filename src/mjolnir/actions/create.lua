@@ -1,6 +1,6 @@
 local path          = require("pl.path")
 local common        = require("common")
-local thunderstore  = require("thor.thunderstore")
+local thunderstore  = require("thunderstore")
 local file          = require("pl.file")
 
 ---@type Action
