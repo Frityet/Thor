@@ -33,7 +33,7 @@ function export.on_run(args)
     local choices = {}
     for _, pkg in pairs(community.packages.database) do
         local pkgid = pkg.full_name:lower()
-        if pkgid:match(search) or pkgid == search then table.insert(choices, pkgid) end
+        if pkgid:match(search) or pkgid == search then table.insert(choices, pkg.full_name) end
     end
 
     if #choices > 1 then
