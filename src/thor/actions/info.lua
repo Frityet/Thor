@@ -27,18 +27,19 @@ function export.configure_command(parser)
 end
 
 function export.on_run(args)
-    local search = args["package"] --[[@as string]]
+    local search = args["package"]:lower() --[[@as string]]
     local community = thunderstore.communities[args["community"]] --[[@as Community]]
     ---@type string[]
     local choices = {}
     for _, pkg in pairs(community.packages.database) do
-        if pkg.full_name:lower():match(search:lower()) or pkg.full_name:lower() == search:lower() then table.insert(choices, pkg.full_name) end
+        local pkgid = pkg.full_name:lower()
+        if pkgid:match(search) or pkgid == search then table.insert(choices, pkgid) end
     end
 
     if #choices > 1 then
         print("- \x1b[33mMultiple packages found\x1b[0m: ")
         for _, v in ipairs(choices) do
-            print("  "..community.packages[v].full_name:lower():gsub(search:lower(), "\x1b[31m"..search:lower().."\x1b[0m"))
+            print("  "..community.packages[v].full_name:lower():gsub(search, "\x1b[31m"..search.."\x1b[0m"))
         end
     elseif #choices == 0 then print("\x1b[31mNo packages found with specified name\x1b[0m")
     else print(community.packages[choices[1]]) end
