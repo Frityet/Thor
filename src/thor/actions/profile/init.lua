@@ -1,5 +1,3 @@
-local thunderstore  = require("thunderstore")
-local common        = require("common")
 local app           = require("pl.app")
 local dir           = require("pl.dir")
 local path          = require("pl.path")
@@ -29,13 +27,13 @@ local function getprofile(self, name)
         error("No profile found under name \""..name.."\"! Did you forget to create it with `\x1b[31mthor\x1b[0m profile create`?")
     end
 
-    return dofile(cfgfile)
+    return pretty.read(file.read(cfgfile))
 end
 
 local function setprofile(self, name, data)
     local cfgfile = path.join(export.profile_dir, name)
 
-    local ok, err = file.write(cfgfile, "return "..pretty.write(data, "", true))
+    local ok, err = file.write(cfgfile, pretty.write(data, "", true))
     if not ok then
         error("Could not write to file \""..cfgfile.."\" Reason:"..err)
     end

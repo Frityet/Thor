@@ -1,10 +1,11 @@
 local thunderstore  = require("thunderstore")
-local common        = require("common")
+local tablex        = require("pl.tablex")
 
 ---@type Action
 local export = {}
 
 function export.configure_command(cmd)
+---@diagnostic disable-next-line: param-type-mismatch
     cmd:argument {
         name = "scope",
         choices = {
@@ -13,10 +14,12 @@ function export.configure_command(cmd)
         },
         default = "database"
     }
+
+---@diagnostic disable-next-line: param-type-mismatch
     cmd:option {
         name = "-c --community",
         args = "+",
-        choices = common.getkeys(thunderstore.communities)
+        choices = tablex.keys(thunderstore.communities)
     }
 end
 

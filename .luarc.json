@@ -20,24 +20,23 @@
         "lua_modules/share/lua/5.1/?/init.lua",
         "lua_modules/lib/lua/5.1/?.so"
     ],
-    "runtime.pathStrict": true,
+    "runtime.pathStrict": false,
     "runtime.version": "LuaJIT",
     "workspace.ignoreDir": [
         ".vscode",
-        "${workspaceDir}/lua_modules/share/lua/5.1/thor"
+        "lua_modules/share/lua/5.1/thor"
     ],
     "workspace.ignoreSubmodules": false,
     "workspace.library": [
-        "types/thor/",
+        "types/thor/library",
         "types/pl/library",
         "types/argparse/library",
         "${3rd}/lfs/library",
         "lua_modules/share/lua/5.1/",
         "lua_modules/lib/lua/5.1/"
-
     ],
     "workspace.useGitIgnore": false,
     "diagnostics.disableScheme": [
-        "*.rockspec"
+        "rockspec"
     ]
 }

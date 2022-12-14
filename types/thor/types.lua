@@ -1,84 +1,83 @@
 ---@meta
 
 ---@alias CommunityIdentifier
----|'hard-bullet'
----|'hotds'
----|'inscryption'
----|'peglin'
----|'totally-accurate-battle-simulator'
----|'edf-5'
----|'potion-craft'
----|'enter-the-gungeon'
----|'ravenfield'
----|'against'
----|'riskofrain2'
----|'aloft'
----|'valheim'
----|'lethal-league-blaze'
----|'baldurs-gate-3'
----|'mechanica'
----|'bonelab'
----|'muck'
----|'for-the-king'
----|'green-hell-vr'
----|'nasb'
 ---|'vtol-vr'
----|'gtfo'
----|'v-rising'
----|'trombone-champ'
----|'rounds'
----|'northstar'
----|'timberborn'
----|'rogue-genesia'
----|'subnautica-below-zero'
----|'boneworks'
----|'subnautica'
----|'cats-are-liquid'
----|'core-keeper'
----|'rogue-tower'
----|'chrono-ark'
----|'stacklands'
+---|'edf-5'
 ---|'talespire'
----|'dyson-sphere-program'
----|'starsand'
----|'h3vr'
----|'cult-of-the-lamb'
----|'outward'
----|'20-minutes-till-dawn'
----|'across-the-obelisk'
----|'3dash'
----|'backpack-hero'
 ---|'edf-4-1'
+---|'v-rising'
+---|'hard-bullet'
+---|'peglin'
+---|'gtfo'
+---|'core-keeper'
+---|'rogue-genesia'
+---|'for-the-king'
+---|'subnautica-below-zero'
+---|'across-the-obelisk'
+---|'rogue-tower'
+---|'trombone-champ'
+---|'hotds'
+---|'bonelab'
+---|'riskofrain2'
+---|'chrono-ark'
+---|'cats-are-liquid'
+---|'dyson-sphere-program'
+---|'3dash'
+---|'against'
+---|'subnautica'
+---|'cult-of-the-lamb'
+---|'inscryption'
+---|'valheim'
+---|'ravenfield'
+---|'nasb'
+---|'outward'
+---|'potion-craft'
+---|'mechanica'
+---|'stacklands'
+---|'h3vr'
+---|'timberborn'
+---|'enter-the-gungeon'
+---|'northstar'
+---|'lethal-league-blaze'
+---|'totally-accurate-battle-simulator'
+---|'backpack-hero'
+---|'baldurs-gate-3'
+---|'boneworks'
+---|'20-minutes-till-dawn'
+---|'muck'
+---|'aloft'
+---|'green-hell-vr'
+---|'rounds'
+---|'starsand'
 ---|''
 
 ---@class Package
 ---@field date_created string
 ---@field date_updated string
----@field has_nsfw_content boolean
----@field is_deprecated boolean
----@field is_pinned boolean
----@field name string
----@field full_name string
 ---@field categories string[]
----@field package_url string
----@field versions Package.Version[]
----@field rating_score number
 ---@field uuid4 string
+---@field full_name string
+---@field rating_score number
+---@field name string
+---@field is_pinned boolean
 ---@field owner string
----@field donation_link string
+---@field is_deprecated boolean
+---@field versions Package.Version[]
+---@field package_url string
+---@field has_nsfw_content boolean
 
 ---@class Package.Version
----@field date_created string
----@field download_url string
----@field downloads number
 ---@field file_size number
----@field icon string
----@field name string
----@field full_name string
+---@field description string
+---@field date_created string
+---@field dependencies string[]
 ---@field version_number string
 ---@field uuid4 string
+---@field download_url string
+---@field downloads number
 ---@field website_url string
----@field dependencies string[]
+---@field full_name string
+---@field name string
 ---@field is_active boolean
----@field description string
+---@field icon string
 

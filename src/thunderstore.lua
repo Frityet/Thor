@@ -1,3 +1,5 @@
+--TODO: Make this file generic, creating no directories, and throwing no errors
+
 local copas         = require("copas")
 local async_https   = require("copas.http")
 local https         = require("ssl.https")
@@ -7,9 +9,9 @@ local pretty        = require("pl.pretty")
 local app           = require("pl.app")
 local dir           = require("pl.dir")
 local path          = require("pl.path")
+local tablex        = require("pl.tablex")
 
 local common        = require("common")
-
 
 local export = {
     ---@type { [CommunityIdentifier] : Community }
@@ -39,6 +41,7 @@ local export = {
 --literally just so my LSP works better
 export.communities[""] = nil
 
+
 do
     local reason
     export.package_directory, reason = app.appfile("packages/")
@@ -49,7 +52,7 @@ end
 local function getpackage(self, idx)
     ---@type string
     local repo_path = getmetatable(self)._file
-    if not rawget(self, "database") then self.database = dofile(repo_path) end
+    if not rawget(self, "database") then self.database = pretty.read(file.read(repo_path)) end
     if not self.database then error("Could not read package database at "..repo_path) end
 
     if idx == "database" then return rawget(self, "database") end
@@ -57,17 +60,17 @@ local function getpackage(self, idx)
 end
 
 function export.fetch_all()
-    local body, c = https.request("https://h3vr.thunderstore.io/api/experimental/community/")
-    if not body or c ~= 200 then error("Could not get community list! Error code: "..c) end
-
-    export.communities = common.array_to_map(json.decode(body)["results"],"identifier")
+    local body, responsecode = https.request("https://h3vr.thunderstore.io/api/experimental/community/")
+    if not body or responsecode ~= 200 then error("Could not get community list! Error code: "..responsecode) end
 
 
-    local l, i = #common.getkeys(export.communities), 0
+    export.communities = common.array_to_map(json.decode(body)["results"], "identifier")
+
+    local communityc, donec = tablex.size(export.communities), 0
     --Get all of the community lists and package lists async
     for _, v in pairs(export.communities) do
         ---@param community Community
-        copas.addthread(function (community, index, keyc)
+        copas.addthread(function (community)
             local id = community.identifier
             local contents, code = async_https.request("https://h3vr.thunderstore.io/api/experimental/community/"..id.."/category/")
             if not contents or code ~= 200 then error("Could not get category for community \""..id.."\"! Error code: "..code) end
@@ -85,14 +88,14 @@ function export.fetch_all()
             local f, reason = io.open(pkg_path, "w+b")
             if not f then error("Could not create file at "..path.."\nReason: "..reason) end
 
-            --This is a bad IDEA!
+            --!This is a bad IDEA!
             --TODO: Replace with actual binary serialization
-            f:write("return ", pretty.write(packages, "", true))
+            f:write(pretty.write(packages, "", true))
 
             f:close()
-            print(string.format("Got package list for community \"%s\" (%d/%d)", id, index, keyc))
-        end, v, i, l)
-        i = i + 1
+            donec = donec + 1
+            print(string.format("Got package list for community \"%s\" (%d/%d)", id, donec, communityc))
+        end, v)
     end
 
     --Run the async loop
@@ -105,11 +108,13 @@ do
         print("Community registry not found, creating...")
         export.fetch_all()
         
-        file.write(community_path, "return "..pretty.write(export.communities, "", true))
+        file.write(community_path, pretty.write(export.communities, "", true))
 
         print("Wrote community registry to "..community_path)
     else
-        export.communities = dofile(community_path)
+        local reason
+        export.communities, reason = pretty.read(file.read(community_path))
+        if not export.communities then error("Could not read community file! Reason: "..reason) end
     end
 
     for k, v in pairs(export.communities) do
@@ -120,6 +125,6 @@ do
     end
 end
 
-if #dir.getfiles(export.package_directory) < #common.getkeys(export.communities) then export.fetch_all() end
+if #dir.getfiles(export.package_directory) < tablex.size(export.communities) then export.fetch_all() end
 
 return export

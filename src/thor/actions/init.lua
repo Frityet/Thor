@@ -1,6 +1,6 @@
 ---@class Action
----@field configure_command fun(parser: table): table?
----@field on_run fun(args: { [string]: string | table })
+---@field configure_command fun(parser: argparse.Command): table?
+---@field on_run fun(args: argparse.Command.PropertiesTable)
 
 ---@type { [string] : Action }
 local actions = {

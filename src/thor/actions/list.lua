@@ -1,19 +1,21 @@
 local thunderstore  = require("thunderstore")
-local common        = require("common")
+local tablex        = require("pl.tablex")
 
 ---@type Action
 local export = {}
 
 function export.configure_command(cmd)
-    local ch = common.getkeys(thunderstore.communities)
+    local ch = tablex.keys(thunderstore.communities)
     ch[#ch+1] = "communities"
 
+---@diagnostic disable-next-line: param-type-mismatch
     cmd:argument {
         name = "community",
         choices = ch,
         default = "communities"
     }
 
+---@diagnostic disable-next-line: param-type-mismatch
     cmd:argument {
         name = "scope",
         choices = {
@@ -24,20 +26,31 @@ function export.configure_command(cmd)
         args = "?"
     }
 
+---@diagnostic disable-next-line: param-type-mismatch
     cmd:option {
         name = "-c --category",
         args = "+"
     }
+
+---@diagnostic disable-next-line: param-type-mismatch
     cmd:option {
         name = "-x --exclude-category",
         args = "+"
     }
 
+
+---@diagnostic disable-next-line: param-type-mismatch
     cmd:option {
         name = "-n --name",
         args = "+"
     }
 
+    ---@diagnostic disable-next-line: param-type-mismatch
+    cmd:option {
+        name = "-a --author",
+        args = "+"
+    }
+---@diagnostic disable-next-line: param-type-mismatch
     cmd:option {
         name = "-z --exclude-author",
         args = "+"
@@ -50,7 +63,8 @@ function export.on_run(arg)
     local scope = arg["scope"] --[[@as "categories" | "packages"]]
     local names = arg["name"] --[[@as string[] ]] or {}
     local cats, xcats = arg["categories"] --[[@as string[] ]] or {}, arg["exclude_category"] --[[@as string[] ]] or {}
-    local xauthor = arg["exclude_author"] --[[@as string[] ]] or {}
+    local authors = arg["author"] --[[@as string[] ]] or {}
+    local xauthors = arg["exclude_author"] --[[@as string[] ]] or {}
 
 
     if community_name == "communities" then
@@ -74,19 +88,18 @@ function export.on_run(arg)
                 for _, name in ipairs(names) do if not pkgid:lower():find(name:lower()) then goto next end end
 
                 for _, cat in ipairs(cats) do
-                    local ok = false
-                    for _, v in ipairs(pkg["categories"]) do if v:lower():find(cat:lower()) then ok = true; break end end
-
-                    if not ok then goto next end
+                    for _, v in ipairs(pkg.categories) do if not v:lower():find(cat:lower()) then goto next end end
                 end
 
                 for _, cat in ipairs(xcats) do
-                    for _, v in ipairs(pkg["categories"]) do if v:lower():find(cat:lower()) then goto next end end
+                    for _, v in ipairs(pkg.categories) do if v:lower():find(cat:lower()) then goto next end end
                 end
 
-                for _, author in ipairs(xauthor) do if pkg["owner"]:lower():find(author:lower()) then goto next end end
+                for _, author in ipairs(authors) do if not pkg.owner:lower():find(author:lower()) then goto next end end
 
-                print(pkg["name"])
+                for _, author in ipairs(xauthors) do if pkg.owner:lower():find(author:lower()) then goto next end end
+
+                print("  "..pkg.name)
 
                 ::next::
             end
