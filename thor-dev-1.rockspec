@@ -14,6 +14,7 @@ dependencies = {
     "copas",
     "argparse",
     "penlight",
+    -- "lanes"
 }
 build = {
     type = "builtin",
@@ -27,23 +28,24 @@ build = {
         ["json"]                            = "src/json.lua",
         ["common"]                          = "src/common.lua",
         ["thunderstore"]                    = "src/thunderstore.lua",
+        ["asyncdownload"]                   = "src/asyncdownload.lua",
 
-        --#region thor  
-
+        --#region thor
         ["thor.actions"]                    = "src/thor/actions/init.lua",
         ["thor.actions.update"]             = "src/thor/actions/update.lua",
         ["thor.actions.info"]               = "src/thor/actions/info.lua",
         ["thor.actions.list"]               = "src/thor/actions/list.lua",
 
-        ["thor.actions.profile"]            = "src/thor/actions/profile/init.lua",
-        ["thor.actions.profile.add"]        = "src/thor/actions/profile/add.lua",
-        ["thor.actions.profile.create"]     = "src/thor/actions/profile/create.lua",
-        ["thor.actions.profile.delete"]     = "src/thor/actions/profile/delete.lua",
-        ["thor.actions.profile.export"]     = "src/thor/actions/profile/export.lua",
-        ["thor.actions.profile.list"]       = "src/thor/actions/profile/list.lua",
-        --#endregion    
+        ["thor.actions.profiles"]            = "src/thor/actions/profiles/init.lua",
+        ["thor.actions.profiles.profile"]    = "src/thor/actions/profiles/profile.lua",
+        ["thor.actions.profiles.add"]        = "src/thor/actions/profiles/add.lua",
+        ["thor.actions.profiles.create"]     = "src/thor/actions/profiles/create.lua",
+        ["thor.actions.profiles.delete"]     = "src/thor/actions/profiles/delete.lua",
+        ["thor.actions.profiles.export"]     = "src/thor/actions/profiles/export.lua",
+        ["thor.actions.profiles.import"]     = "src/thor/actions/profiles/import.lua",
+        --#endregion
 
-        --#region mjolnir   
+        --#region mjolnir
         ["mjolnir.actions"]                 = "src/mjolnir/actions/init.lua",
         ["mjolnir.actions.create"]          = "src/mjolnir/actions/create.lua"
         --#endregion
