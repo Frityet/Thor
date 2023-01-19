@@ -76,7 +76,7 @@ function export.on_run(arg)
         end
     else
         local community = thunderstore.communities[community_name]
-
+        
         if scope == "categories" then
             print("- Categories for "..community_name..":")
             for _, v in pairs(community.categories) do

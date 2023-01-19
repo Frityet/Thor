@@ -68,8 +68,9 @@ function export.fetch_all()
 
     local communityc, donec = tablex.size(export.communities), 0
     --Get all of the community lists and package lists async
-    for _, community in pairs(export.communities) do
-        copas.addthread(function ()
+    for _, v in pairs(export.communities) do
+        ---@param community Community
+        copas.addthread(function (community)
             local id = community.identifier
             local contents, code = async_https.request("https://h3vr.thunderstore.io/api/experimental/community/"..id.."/category/")
             if not contents or code ~= 200 then error("Could not get category for community \""..id.."\"! Error code: "..code) end
@@ -84,15 +85,17 @@ function export.fetch_all()
             local packages = common.array_to_map(json.decode(contents), "full_name")
 
             local pkg_path = path.join(export.package_directory, id..".lua")
+            local f, reason = io.open(pkg_path, "w+b")
+            if not f then error("Could not create file at "..path.."\nReason: "..reason) end
 
             --!This is a bad IDEA!
             --TODO: Replace with actual binary serialization
-            local ok, err = file.write(pkg_path, pretty.write(packages, "", true))
-            if not ok then error("Could not write to "..pkg_path.."! Reason: "..err) end
+            f:write(pretty.write(packages, "", true))
 
+            f:close()
             donec = donec + 1
             print(string.format("Got package list for community \"%s\" (%d/%d)", id, donec, communityc))
-        end)
+        end, v)
     end
 
     --Run the async loop
@@ -104,7 +107,7 @@ do
     if not path.exists(community_path) then
         print("Community registry not found, creating...")
         export.fetch_all()
-
+        
         file.write(community_path, pretty.write(export.communities, "", true))
 
         print("Wrote community registry to "..community_path)
@@ -123,6 +126,5 @@ do
 end
 
 if #dir.getfiles(export.package_directory) < tablex.size(export.communities) then export.fetch_all() end
-
 
 return export
