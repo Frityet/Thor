@@ -1,0 +1,83 @@
+---@meta
+
+---@alias CommunityIdentifier
+---|'vtol-vr'
+---|'edf-5'
+---|'talespire'
+---|'edf-4-1'
+---|'v-rising'
+---|'hard-bullet'
+---|'peglin'
+---|'gtfo'
+---|'core-keeper'
+---|'rogue-genesia'
+---|'for-the-king'
+---|'subnautica-below-zero'
+---|'across-the-obelisk'
+---|'rogue-tower'
+---|'trombone-champ'
+---|'hotds'
+---|'bonelab'
+---|'riskofrain2'
+---|'chrono-ark'
+---|'cats-are-liquid'
+---|'dyson-sphere-program'
+---|'3dash'
+---|'against'
+---|'subnautica'
+---|'cult-of-the-lamb'
+---|'inscryption'
+---|'valheim'
+---|'ravenfield'
+---|'nasb'
+---|'outward'
+---|'potion-craft'
+---|'mechanica'
+---|'stacklands'
+---|'h3vr'
+---|'timberborn'
+---|'enter-the-gungeon'
+---|'northstar'
+---|'lethal-league-blaze'
+---|'totally-accurate-battle-simulator'
+---|'backpack-hero'
+---|'baldurs-gate-3'
+---|'boneworks'
+---|'20-minutes-till-dawn'
+---|'muck'
+---|'aloft'
+---|'green-hell-vr'
+---|'rounds'
+---|'starsand'
+---|''
+
+---@class Package
+---@field date_created string
+---@field date_updated string
+---@field categories string[]
+---@field uuid4 string
+---@field full_name string
+---@field rating_score number
+---@field name string
+---@field is_pinned boolean
+---@field owner string
+---@field is_deprecated boolean
+---@field versions Package.Version[]
+---@field package_url string
+---@field has_nsfw_content boolean
+
+---@class Package.Version
+---@field file_size number
+---@field description string
+---@field date_created string
+---@field dependencies string[]
+---@field version_number string
+---@field uuid4 string
+---@field download_url string
+---@field downloads number
+---@field website_url string
+---@field full_name string
+---@field name string
+---@field is_active boolean
+---@field icon string
+
