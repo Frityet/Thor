@@ -24,19 +24,21 @@
     "runtime.version": "LuaJIT",
     "workspace.ignoreDir": [
         ".vscode",
-        "lua_modules/share/lua/5.1/thor"
+        "lua_modules/share/lua/5.1/thor",
+        "lua_modules/share/lua/5.1/mjolnir",
     ],
     "workspace.ignoreSubmodules": false,
     "workspace.library": [
         "types/thor/library",
-        "types/pl/library",
-        "types/argparse/library",
-        "${3rd}/lfs/library",
         "lua_modules/share/lua/5.1/",
-        "lua_modules/lib/lua/5.1/"
+        "lua_modules/lib/lua/5.1/",
     ],
     "workspace.useGitIgnore": false,
     "diagnostics.disableScheme": [
         "rockspec"
-    ]
+    ],
+    "diagnostics.globals": [
+        "lfs"
+    ],
+    "workspace.checkThirdParty": false
 }

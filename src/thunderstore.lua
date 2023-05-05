@@ -3,7 +3,7 @@
 local copas         = require("copas")
 local async_https   = require("copas.http")
 local https         = require("ssl.https")
-local json          = require("json")
+local json   = require("json")
 local file          = require("pl.file")
 local pretty        = require("pl.pretty")
 local app           = require("pl.app")
@@ -107,7 +107,7 @@ do
     if not path.exists(community_path) then
         print("Community registry not found, creating...")
         export.fetch_all()
-        
+
         file.write(community_path, pretty.write(export.communities, "", true))
 
         print("Wrote community registry to "..community_path)
