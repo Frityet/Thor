@@ -371,7 +371,16 @@ parse = function(str, idx)
   decode_error(str, idx, "unexpected character '" .. chr .. "'")
 end
 
+---@class JSON.Object
+---@field [string] JSON.Value
 
+---@class JSON.Array
+---@field [integer] JSON.Value
+
+---@alias JSON.Value string | number | boolean | JSON.Object | JSON.Array
+
+---@param str string
+---@return JSON.Object
 function json.decode(str)
   if type(str) ~= "string" then
     error("expected argument of type string, got " .. type(str))
