@@ -1,3 +1,5 @@
+use serde::*;
+use serde_derive::{Serialize, Deserialize};
 /*
  * Thunderstore API
  *
