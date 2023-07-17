@@ -51,15 +51,10 @@
     return self->_categories;
 }
 
-- (TSPackage *_Nullable) packageWithNamespace: (OFString *)ns name: (OFString *)name
+- (TSPackage *) packageWithNamespace: (OFString *)ns name: (OFString *)name
 {
     auto resp = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [TSPackage urlWithParametres: @{ @"community": self.identifier, @"namespace": ns, @"name": name }]]];
     auto json = (OFDictionary *)[resp objectByParsingJSON];
-    if (json == nil)
-        return nil;
-
-    if (json[@"detail"]) // 404
-        return nil;
 
     return [TSPackage modelFromJSON: json];
 }

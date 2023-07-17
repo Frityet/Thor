@@ -32,7 +32,7 @@ OF_ASSUME_NONNULL_BEGIN
 + (instancetype)communityFromIdentifier: (OFString *)identifier;
 - (instancetype)initFromIdentifier: (OFString *)identifier;
 
-- (TSPackage *_Nullable) packageWithNamespace: (OFString *)ns name: (OFString *)name;
+- (TSPackage *) packageWithNamespace: (OFString *)ns name: (OFString *)name;
 
 @end
 

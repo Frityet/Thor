@@ -25,7 +25,10 @@
     created = [created substringToIndex: [created rangeOfString: @"." options: OFStringSearchBackwards].location];
 
     self->_dateCreated = [OFDate dateWithDateString: created format: @"%Y-%m-%dT%H:%M:%S"];
-    self->_websiteURL = [OFIRI IRIWithString: $assert_nonnil($json_field(json, @"website_url", OFString))];
+
+    auto weburl = $json_field(json, @"website_url", OFString);
+    if (weburl != nil)
+        self->_websiteURL = [OFIRI IRIWithString: $assert_nonnil(weburl)];
     self->_isActive = $assert_nonnil($json_field(json, @"is_active", OFNumber)).boolValue;
 
     return self;

@@ -16,7 +16,7 @@ OF_ASSUME_NONNULL_BEGIN
 @property(atomic, readonly) OFIRI *downloadURL;
 @property(atomic, readonly) unsigned int downloads;
 @property(atomic, readonly) OFDate *dateCreated;
-@property(atomic, readonly) OFIRI *websiteURL;
+@property(atomic, readonly, nullable) OFIRI *websiteURL;
 @property(atomic, readonly) bool isActive;
 
 @end
