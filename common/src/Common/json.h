@@ -14,8 +14,9 @@ OF_ASSUME_NONNULL_BEGIN
 
 @property (readonly, nonatomic) OFString *key;
 @property (readonly, nonatomic) Class expectedType;
+@property (readonly, nonatomic) Class realType;
 
-+ (instancetype)exceptionWithKey: (OFString *)key expectedType: (Class)expectedType;
++ (instancetype)exceptionWithKey: (OFString *)key expectedType: (Class)expectedType realType: (Class)realType;
 
 @end
 

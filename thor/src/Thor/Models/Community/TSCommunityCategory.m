@@ -1,6 +1,6 @@
-#include "TSCategory.h"
+#include "TSCommunityCategory.h"
 
-@implementation TSCategory
+@implementation TSCommunityCategory
 
 + (instancetype)modelFromJSON:(OFDictionary *)json
 {

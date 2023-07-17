@@ -1,6 +1,5 @@
 #import "Common/ObjFW.h"
 #import "Models/Community/TSCommunity.h"
-#import "Models/Community/TSCategory.h"
 
 OF_ASSUME_NONNULL_BEGIN
 

@@ -1,8 +1,9 @@
 #import "Common/common.h"
 
 #import "Thor/Models/ITSModel.h"
+#import "Thor/Models/Package/TSPackage.h"
 
-#import "TSCategory.h"
+#import "TSCommunityCategory.h"
 
 /*
   "results": [
@@ -20,9 +21,18 @@ OF_ASSUME_NONNULL_BEGIN
 
 @interface TSCommunity : OFObject<ITSModel>
 
-@property(atomic, readonly) OFString *identifier, *name, *_Nullable discordURL, *_Nullable wikiURL;
+@property(atomic, readonly) OFString *identifier;
+@property(atomic, readonly) OFString *name;
+@property(atomic, readonly) OFString *_Nullable discordURL;
+@property(atomic, readonly) OFString *_Nullable wikiURL;
 @property(atomic, readonly) bool requirePackageListingApproval;
-@property(atomic, readonly) OFArray<TSCategory *> *categories;
+
+@property(atomic, readonly) OFArray<TSCommunityCategory *> *categories;
+
++ (instancetype)communityFromIdentifier: (OFString *)identifier;
+- (instancetype)initFromIdentifier: (OFString *)identifier;
+
+- (TSPackage *_Nullable) packageWithNamespace: (OFString *)ns name: (OFString *)name;
 
 @end
 

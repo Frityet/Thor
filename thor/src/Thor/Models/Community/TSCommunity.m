@@ -21,28 +21,47 @@
     return self;
 }
 
++ (instancetype)communityFromIdentifier:(OFString *)identifier
+{ return [[self alloc] initFromIdentifier: identifier]; }
+
+- (instancetype)initFromIdentifier:(OFString *)identifier
+{ return [self initWithJSON: (OFDictionary *)[OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [TSCommunity urlWithParametres: @{ @"community": identifier }]]].objectByParsingJSON]; }
+
 + (OFString *)url
 { return @"https://thunderstore.io/api/experimental/community/"; }
 
-+ (OFString *)urlWithParametres:(OFDictionary<OFString *,OFString *> *)_
-{ return $assert_nonnil(self.url); }
++ (OFString *)urlWithParametres:(OFDictionary<OFString *,OFString *> *)params
+{ return [OFString stringWithFormat: @"https://%@.thunderstore.io/api/experimental/current-community/", params[@"community"]]; }
 
-- (OFArray<TSCategory *> *)categories
+- (OFArray<TSCommunityCategory *> *)categories
 {
     if (self->_categories == nil)
     {
-        auto resp = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [OFString stringWithFormat: @"https://thunderstore.io/api/experimental/community/%@/category/", self->_identifier]]];
+        auto resp = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [TSCommunityCategory.class urlWithParametres: @{ @"community": self.identifier }]]];
         auto json = (OFDictionary *)[resp objectByParsingJSON];
 
         auto results = $assert_nonnil($json_field(json, @"results", OFArray<OFDictionary *>));
 
         auto cats = [OFMutableArray array];
         for (OFDictionary *result in results)
-            [cats addObject: [TSCategory modelFromJSON: result]];
+            [cats addObject: [TSCommunityCategory modelFromJSON: result]];
 
         self->_categories = cats;
     }
     return self->_categories;
+}
+
+- (TSPackage *_Nullable) packageWithNamespace: (OFString *)ns name: (OFString *)name
+{
+    auto resp = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [TSPackage urlWithParametres: @{ @"community": self.identifier, @"namespace": ns, @"name": name }]]];
+    auto json = (OFDictionary *)[resp objectByParsingJSON];
+    if (json == nil)
+        return nil;
+
+    if (json[@"detail"]) // 404
+        return nil;
+
+    return [TSPackage modelFromJSON: json];
 }
 
 @end

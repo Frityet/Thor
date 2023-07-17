@@ -25,12 +25,12 @@
 
 @implementation JSONTypeMismatchException
 
-+ (instancetype)exceptionWithKey: (OFString *)key expectedType: (Class)expectedType
++ (instancetype)exceptionWithKey: (OFString *)key expectedType: (Class)expectedType realType: (Class)realType
 {
-    return [[self alloc] initWithKey: key expectedType: expectedType];
+    return [[self alloc] initWithKey: key expectedType: expectedType realType: realType];
 }
 
-- (instancetype)initWithKey: (OFString *)key expectedType: (Class)expectedType
+- (instancetype)initWithKey: (OFString *)key expectedType: (Class)expectedType realType: (Class)realType
 {
     self = [super init];
     if (self == nil)
@@ -38,12 +38,13 @@
 
     _key = [key copy];
     _expectedType = expectedType;
+    _realType = realType;
 
     return self;
 }
 
 - (OFString *)description
-{ return [OFString stringWithFormat: @"Type mismatch: %@ is not a %@", _key, _expectedType]; }
+{ return [OFString stringWithFormat: @"Type mismatch: %@ is not a %@ (real type: %@)", _key, _expectedType, _realType]; }
 
 @end
 
@@ -57,7 +58,7 @@ id _Nullable get_json_field(OFDictionary *json, OFString *key, Class type)
         return nil;
 
     if (![value isKindOfClass:type])
-        @throw [JSONTypeMismatchException exceptionWithKey: key expectedType: type];
+        @throw [JSONTypeMismatchException exceptionWithKey: key expectedType: type realType: [value class]];
 
     return value;
 }

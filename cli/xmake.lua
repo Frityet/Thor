@@ -51,7 +51,7 @@ do
     add_files("src/**.m")
     add_headerfiles("src/**.h")
 
-    add_includedirs("src/", "src/include")
+    add_includedirs("src/")
 
     add_mflags(mflags.regular)
     add_ldflags(ldflags.regular)
