@@ -1,0 +1,11 @@
+{
+    "Lua.workspace.library": [
+        "/Users/frityet/Library/Application Support/Code/User/globalStorage/sumneko.lua/addonManager/addons/xmake/module/library"
+    ],
+    "Lua.runtime.version": "Lua 5.4",
+    "Lua.workspace.checkThirdParty": false,
+
+    "files.associations": {
+        "*.h": "objective-c"
+    }
+}
