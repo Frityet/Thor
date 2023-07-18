@@ -2,7 +2,8 @@ includes("../packages.lua", "../common")
 
 --Config:
 local packages = {
-    "objfw-local"
+    "objfw-local",
+    "simdjson"
 }
 
 local sanitizers = { }
@@ -52,21 +53,21 @@ do
 
     add_includedirs("src/", { public = true })
 
-    add_mflags(mflags.regular)
+    add_mxflags(mflags.regular)
     add_ldflags(ldflags.regular)
 
     if is_mode("debug") then
-        add_mflags(mflags.debug)
+        add_mxflags(mflags.debug)
         add_ldflags(ldflags.debug)
 
         for _, v in ipairs(sanitizers) do
-            add_mflags("-fsanitize=" .. v)
+            add_mxflags("-fsanitize=" .. v)
             add_ldflags("-fsanitize=" .. v)
         end
 
         add_defines("PROJECT_DEBUG")
     elseif is_mode("release") then
-        add_mflags(mflags.release)
+        add_mxflags(mflags.release)
         add_ldflags(ldflags.release)
     end
 end

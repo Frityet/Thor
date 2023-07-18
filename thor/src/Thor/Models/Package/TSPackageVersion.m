@@ -10,7 +10,6 @@
     if ((self = [super init]) == nil)
         return nil;
 
-    self->_namespace = $assert_nonnil($json_field(json, @"namespace", OFString));
     self->_name = $assert_nonnil($json_field(json, @"name", OFString));
     self->_versionNumber = VersionFromString($assert_nonnil($json_field(json, @"version_number", OFString)));
     self->_fullName = $assert_nonnil($json_field(json, @"full_name", OFString));
@@ -27,9 +26,17 @@
     self->_dateCreated = [OFDate dateWithDateString: created format: @"%Y-%m-%dT%H:%M:%S"];
 
     auto weburl = $json_field(json, @"website_url", OFString);
-    if (weburl != nil)
-        self->_websiteURL = [OFIRI IRIWithString: $assert_nonnil(weburl)];
+    if (weburl != nil) {
+        @try {
+            self->_websiteURL = [OFIRI IRIWithString: $assert_nonnil(weburl)];
+        } @catch(OFException *ex) {
+            self->_websiteURL = nil;
+        }
+    }
     self->_isActive = $assert_nonnil($json_field(json, @"is_active", OFNumber)).boolValue;
+
+    self->_uuid4 = [OFUUID UUIDWithUUIDString: $assert_nonnil($json_field(json, @"uuid4", OFString))];
+    self->_fileSize = $assert_nonnil($json_field(json, @"file_size", OFNumber)).unsignedLongLongValue;
 
     return self;
 }
@@ -38,7 +45,7 @@
 { return nil; }
 
 + (OFString *)urlWithParametres:(OFDictionary<OFString *, OFString *> *)params
-{ return [OFString stringWithFormat: @"https://%@.thunderstore.io/api/experimental/package/%@/%@/%@/", params[@"community"], params[@"namespace"], params[@"name"], params[@"version"]]; }
+{ return [OFString stringWithFormat: @"https://%@.thunderstore.io/api/experimental/package/%@/%@/%@/", params[@"community"], params[@"author"], params[@"name"], params[@"version"]]; }
 
 - (OFString *)description
 { return [OFString stringWithFormat: @"<TSPackageVersion: %@>", self.fullName]; }

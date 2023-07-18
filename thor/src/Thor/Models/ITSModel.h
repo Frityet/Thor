@@ -2,7 +2,19 @@
 
 OF_ASSUME_NONNULL_BEGIN
 
-@protocol ITSModel
+@protocol ITSSerializable
+
+// - (OFData *)serialize;
+
+@end
+
+@protocol ITSDeserializable
+
+// + (instancetype)deserialize: (OFData *)data;
+
+@end
+
+@protocol ITSModel<ITSSerializable, ITSDeserializable>
 
 + (instancetype) modelFromJSON:(OFDictionary *)json;
 - (instancetype) initWithJSON:(OFDictionary *)json;

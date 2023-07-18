@@ -28,11 +28,12 @@ OF_ASSUME_NONNULL_BEGIN
 @property(atomic, readonly) bool requirePackageListingApproval;
 
 @property(atomic, readonly) OFArray<TSCommunityCategory *> *categories;
+@property(atomic, readonly) OFArray<TSMod *> *mods;
 
 + (instancetype)communityFromIdentifier: (OFString *)identifier;
 - (instancetype)initFromIdentifier: (OFString *)identifier;
 
-- (TSPackage *) packageWithNamespace: (OFString *)ns name: (OFString *)name;
+- (TSMod *) modWithAuthor: (OFString *)ns name: (OFString *)name;
 
 @end
 

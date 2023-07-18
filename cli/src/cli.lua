@@ -45,12 +45,12 @@ function ParseArguments(args, program_name)
 
             ---@diagnostic disable-next-line: param-type-mismatch
             cmd:option {
-                name = "-a --namespace",
+                name = "-a --author",
                 args = "+"
             }
             ---@diagnostic disable-next-line: param-type-mismatch
             cmd:option {
-                name = "-z --exclude-namespace",
+                name = "-z --exclude-author",
                 args = "+"
             }
         end
@@ -124,8 +124,8 @@ function ParseArguments(args, program_name)
                 local cmd = cmd:command("add", "Add a mod to a profile")
                 ---@diagnostic disable-next-line: param-type-mismatch
                 cmd:argument {
-                    name = "namespace",
-                    description = "The mod's namespace",
+                    name = "author",
+                    description = "The mod's author",
                     args = 1,
                 }
 

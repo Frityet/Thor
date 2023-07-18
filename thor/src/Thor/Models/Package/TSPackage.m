@@ -1,6 +1,6 @@
 #include "TSPackage.h"
 
-@implementation TSPackage
+@implementation TSMod
 
 + (instancetype)modelFromJSON:(OFDictionary *)json
 { return [[self alloc] initWithJSON: json]; }
@@ -10,7 +10,6 @@
     if ((self = [super init]) == nil)
         return nil;
 
-    self->_namespace = $assert_nonnil($json_field(json, @"namespace", OFString));
     self->_name = $assert_nonnil($json_field(json, @"name", OFString));
     self->_fullName = $assert_nonnil($json_field(json, @"full_name", OFString));
     self->_owner = $assert_nonnil($json_field(json, @"owner", OFString));
@@ -30,9 +29,12 @@
     self->_ratingScore = $assert_nonnil($json_field(json, @"rating_score", OFNumber)).intValue;
     self->_isPinned = $assert_nonnil($json_field(json, @"is_pinned", OFNumber)).boolValue;
     self->_isDeprecated = $assert_nonnil($json_field(json, @"is_deprecated", OFNumber)).boolValue;
-    self->_totalDownloads = $assert_nonnil($json_field(json, @"total_downloads", OFNumber)).intValue;
+    self->_hasNSFWContent = $assert_nonnil($json_field(json, @"has_nsfw_content", OFNumber)).boolValue;
+    self->_categories = $assert_nonnil($json_field(json, @"categories", OFArray<OFString *>));
 
-    self->_latest = [TSPackageVersion modelFromJSON: $assert_nonnil($json_field(json, @"latest", OFDictionary))];
+    auto versions = [OFMutableArray array];
+    for (OFDictionary *ver in $assert_nonnil($json_field(json, @"versions", OFArray<OFDictionary *>)))
+        [versions addObject: [TSPackageVersion modelFromJSON: ver]];
 
     return self;
 }
@@ -41,7 +43,18 @@
 { return nil; }
 
 + (OFString *)urlWithParametres:(OFDictionary<OFString *,OFString *> *)params
-{ return [OFString stringWithFormat: @"https://%@.thunderstore.io/api/experimental/package/%@/%@/", params[@"community"], params[@"namespace"], params[@"name"]]; }
+{
+    auto community = params[@"community"];
+    auto author = params[@"author"];
+    auto name = params[@"name"];
+
+    if (author == nil)
+        //assume we want all packages, we need to use the v1 endpoint because the experiemntal one returns all packages from all communities
+        return [OFString stringWithFormat: @"https://%@.thunderstore.io/api/v1/package/", community];
+
+
+    return [OFString stringWithFormat: @"https://%@.thunderstore.io/api/experimental/package/%@/%@/", community, author, name];
+}
 
 - (OFString *)description
 { return [OFString stringWithFormat: @"<TSPackage: %@>", self.fullName]; }

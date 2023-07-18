@@ -14,20 +14,21 @@
 
 - (id)listWithArguments: (OFDictionary<OFString *, id> *)args
 {
-    [OFStdOut writeLine: @"Listing categories..."];
-    [OFStdOut writeFormat: @"%@\n", args];
-
-    auto communities = Thor.communities;
-    for (TSCommunity *community in communities) {
-        [OFStdOut writeFormat: @"%@:\n", community.name];
-        [OFStdOut writeFormat: @"  Discord: %@\n", community.discordURL];
-        [OFStdOut writeFormat: @"  Wiki: %@\n", community.wikiURL];
-        [OFStdOut writeFormat: @"  Categories:\n"];
-        for (TSCommunityCategory *category in community.categories)
-            [OFStdOut writeFormat: @"  - %@\n", category.name];
+    auto community = [Thor communityWithSlug: $assert_type(args[@"community"], OFString)];
+    if (community == nil) {
+        [OFStdErr writeFormat: @"Community %@ not found.\n", args[@"community"]];
+        return @(1);
     }
 
-    return nil;
+    if ([args[@"scope"] isEqual: @"categories"]) {
+        for (TSCommunityCategory *category in community.categories)
+            [OFStdOut writeFormat: @"%@\n", category.name];
+    } else if ([args[@"scope"] isEqual: @"mods"]) {
+        for (TSMod *mod in community.mods)
+            [OFStdOut writeFormat: @"%@\n", mod.name];
+    }
+
+    return @(0);
 }
 
 - (id)infoWithArguments: (OFDictionary<OFString *, id> *)args
@@ -35,7 +36,7 @@
     [OFStdOut writeLine: @"Getting info..."];
     [OFStdOut writeFormat: @"%@\n", args];
 
-    return nil;
+    return @(0);
 }
 
 - (id)updateWithArguments: (OFDictionary<OFString *, id> *)args
@@ -43,14 +44,14 @@
     [OFStdOut writeLine: @"Updating..."];
     [OFStdOut writeFormat: @"%@\n", args];
 
-    return nil;
+    return @(0);
 }
 
 - (id)profileWithArguments: (OFDictionary<OFString *, id> *)args
 {
     [OFStdOut writeLine: @"Getting profile..."];
     [OFStdOut writeFormat: @"%@\n", args];
-    return nil;
+    return @(0);
     // return execute_commands(args, @"profile-command", (struct CommandInformation []) {
     //     {0}
     // });
@@ -58,7 +59,6 @@
 
 - (void)applicationDidFinishLaunching: (OFNotification*)notification
 {
-    OFLog(@"Test: %@\n", OFApplication.sharedApplication);
     auto lua = luaL_newstate();
     luaL_openlibs(lua);
     auto arguments = parse_arguments(lua, $assert_nonnil(OFApplication.arguments), $assert_nonnil(OFApplication.programName));
@@ -73,6 +73,7 @@
     });
     #undef $cmd
 
+    lua_close(lua);
     [OFApplication terminateWithStatus: code.unsignedIntValue];
 }
 

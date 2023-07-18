@@ -1,11 +1,10 @@
 #include "json.h"
+#include "macros.h"
 
 @implementation JSONKeyNotFoundException
 
 + (instancetype)exceptionWithKey: (OFString *)key
-{
-    return [[self alloc] initWithKey: key];
-}
+{ return [[self alloc] initWithKey: key]; }
 
 - (instancetype)initWithKey: (OFString *)key
 {
@@ -44,7 +43,7 @@
 }
 
 - (OFString *)description
-{ return [OFString stringWithFormat: @"Type mismatch: %@ is not a %@ (real type: %@)", _key, _expectedType, _realType]; }
+{ return [OFString stringWithFormat: @"Type mismatch: the value of %@ is not a %@ (real type: %@)", _key, _expectedType, _realType]; }
 
 @end
 

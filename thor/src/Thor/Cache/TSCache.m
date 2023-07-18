@@ -72,7 +72,7 @@
 {
     auto file = [self createFileNamed: name];
     [file seekToOffset: 0 whence: OFSeekSet];
-    [file asyncWriteString: contents];
+    [file writeString: contents];
     return file;
 }
 
@@ -83,7 +83,7 @@
 {
     auto file = [self createFileNamed: key];
     [file seekToOffset: 0 whence: OFSeekSet];
-    [file asyncWriteString: str];
+    [file writeString: str];
 }
 
 @end

@@ -8,9 +8,15 @@
 }))
 
 #define $assert_type(x, y) ({ \
-    auto _ = (x); \
-    if (![_ isKindOfClass: [y class]]) \
+    id _ = (x); \
+    if (!(_ && [_ isKindOfClass: [y class]])) \
         @throw [OFInvalidArgumentException exception]; \
     _; \
 })
 #define $SelectorFunction(ret, ...) typeof(ret(id, SEL, __VA_ARGS__))
+
+#if defined(__cplusplus)
+#   define $nomangle extern "C"
+#else
+#   define $nomangle
+#endif

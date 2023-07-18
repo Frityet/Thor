@@ -2,7 +2,8 @@ includes("../packages.lua", "../thor", "../common")
 
 --Config:
 local packages = {
-    "objfw-local", "lua"
+    "objfw-local",
+    "lua",
 }
 
 local sanitizers = { "address", "leak", "undefined" }
@@ -50,25 +51,26 @@ do
     add_deps("Thor", "Common")
 
     add_files("src/**.m")
+    add_files("src/**.mm")
     add_headerfiles("src/**.h")
 
     add_includedirs("src/")
 
-    add_mflags(mflags.regular)
+    add_mxflags(mflags.regular)
     add_ldflags(ldflags.regular)
 
     if is_mode("debug") then
-        add_mflags(mflags.debug)
+        add_mxflags(mflags.debug)
         add_ldflags(ldflags.debug)
 
         for _, v in ipairs(sanitizers) do
-            add_mflags("-fsanitize=" .. v)
+            add_mxflags("-fsanitize=" .. v)
             add_ldflags("-fsanitize=" .. v)
         end
 
         add_defines("PROJECT_DEBUG")
     elseif is_mode("release") then
-        add_mflags(mflags.release)
+        add_mxflags(mflags.release)
         add_ldflags(ldflags.release)
     end
 

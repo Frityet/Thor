@@ -2,7 +2,7 @@ includes("../packages.lua")
 
 --Config:
 local packages = {
-    "objfw-local"
+    "objfw-local",
 }
 
 local sanitizers = { }
@@ -47,26 +47,28 @@ do
     add_packages(packages)
 
     add_files("src/**.m")
+    add_files("src/**.mm")
     add_headerfiles("src/**.h")
     set_pmheader("src/Common/common.h")
 
     add_includedirs("src/", { public = true })
 
-    add_mflags(mflags.regular)
+    add_mxflags(mflags.regular)
+    add_mxxflags("-fexceptions", "-fobjc-exceptions", "-funwind-tables", "-fconstant-string-class=OFConstantString", "-Xclang", "-fno-constant-cfstrings", "-fblocks", "-fobjc-arc", "-fobjc-arc-exceptions")
     add_ldflags(ldflags.regular)
 
     if is_mode("debug") then
-        add_mflags(mflags.debug)
+        add_mxflags(mflags.debug)
         add_ldflags(ldflags.debug)
 
         for _, v in ipairs(sanitizers) do
-            add_mflags("-fsanitize=" .. v)
+            add_mxflags("-fsanitize=" .. v)
             add_ldflags("-fsanitize=" .. v)
         end
 
         add_defines("PROJECT_DEBUG")
     elseif is_mode("release") then
-        add_mflags(mflags.release)
+        add_mxflags(mflags.release)
         add_ldflags(ldflags.release)
     end
 end

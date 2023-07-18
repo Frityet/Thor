@@ -5,7 +5,11 @@ OF_ASSUME_NONNULL_BEGIN
 
 __attribute__((objc_root_class))
 @interface Thor
+
 @property (class, readonly) OFArray<TSCommunity *> *communities;
+
++ (TSCommunity *_Nullable)communityWithSlug: (OFString *)slug;
+
 @end
 
 OF_ASSUME_NONNULL_END
