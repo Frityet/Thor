@@ -44,6 +44,14 @@
     if (![OFFileManager.defaultManager directoryExistsAtPath: directory.path])
         [OFFileManager.defaultManager createDirectoryAtPath: directory.path createParents: true];
 
+    //Add all files in the cache directory to the cache
+    for (OFString *file in [OFFileManager.defaultManager contentsOfDirectoryAtPath: directory.path]) {
+        auto path = [directory IRIByAppendingPathComponent: file];
+        if ([OFFileManager.defaultManager directoryExistsAtPath: path.path])
+            continue;
+        self->_cache[file] = [OFFile fileWithPath: path.path mode: @"r+"];
+    }
+
     return self;
 }
 
@@ -64,7 +72,7 @@
 {
     auto file = [self createFileNamed: name];
     [file seekToOffset: 0 whence: OFSeekSet];
-    [file writeString: contents];
+    [file asyncWriteString: contents];
     return file;
 }
 
@@ -75,7 +83,7 @@
 {
     auto file = [self createFileNamed: key];
     [file seekToOffset: 0 whence: OFSeekSet];
-    [file writeString: str];
+    [file asyncWriteString: str];
 }
 
 @end

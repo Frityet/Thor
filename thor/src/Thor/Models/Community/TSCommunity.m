@@ -1,5 +1,5 @@
 #include "TSCommunity.h"
-#include "ObjFW/OFJSONRepresentation.h"
+#include "Thor/Cache/TSCache.h"
 
 
 @implementation TSCommunity
@@ -36,19 +36,37 @@
 
 - (OFArray<TSCommunityCategory *> *)categories
 {
-    if (self->_categories == nil)
-    {
-        auto resp = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [TSCommunityCategory.class urlWithParametres: @{ @"community": self.identifier }]]];
-        auto json = (OFDictionary *)[resp objectByParsingJSON];
+    //CACHE EVERYTHING
+    if (self->_categories == nil) {
+        const auto fname = [OFString stringWithFormat: @"%@.categories", self.identifier];
+        auto file = TSCache.sharedCache[fname];
+        if (file != nil)
+        {
+            auto json = (OFDictionary *)[OFString stringWithData: $assert_nonnil([file readDataUntilEndOfStream]) encoding: OFStringEncodingUTF8].objectByParsingJSON;
 
-        auto results = $assert_nonnil($json_field(json, @"results", OFArray<OFDictionary *>));
+            auto results = $assert_nonnil($json_field(json, @"results", OFArray<OFDictionary *>));
 
-        auto cats = [OFMutableArray array];
-        for (OFDictionary *result in results)
-            [cats addObject: [TSCommunityCategory modelFromJSON: result]];
+            auto cats = [OFMutableArray array];
+            for (OFDictionary *result in results)
+                [cats addObject: [TSCommunityCategory modelFromJSON: result]];
 
-        self->_categories = cats;
+            self->_categories = cats;
+        } else {
+            auto resp = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [TSCommunityCategory urlWithParametres: @{ @"community": self.identifier }]]];
+            auto json = (OFDictionary *)[resp objectByParsingJSON];
+
+            auto results = $assert_nonnil($json_field(json, @"results", OFArray<OFDictionary *>));
+
+            auto cats = [OFMutableArray array];
+            for (OFDictionary *result in results)
+                [cats addObject: [TSCommunityCategory modelFromJSON: result]];
+
+            file = [TSCache.sharedCache createFileNamed: fname];
+            [file asyncWriteString: cats.JSONRepresentation];
+            self->_categories = cats;
+        }
     }
+
     return self->_categories;
 }
 

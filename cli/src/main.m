@@ -19,9 +19,12 @@
 
     auto communities = Thor.communities;
     for (TSCommunity *community in communities) {
-        [OFStdOut writeFormat: @"%@\n", community.name];
+        [OFStdOut writeFormat: @"%@:\n", community.name];
+        [OFStdOut writeFormat: @"  Discord: %@\n", community.discordURL];
+        [OFStdOut writeFormat: @"  Wiki: %@\n", community.wikiURL];
+        [OFStdOut writeFormat: @"  Categories:\n"];
         for (TSCommunityCategory *category in community.categories)
-            [OFStdOut writeFormat: @"\t%@\n", category.name];
+            [OFStdOut writeFormat: @"  - %@\n", category.name];
     }
 
     return nil;

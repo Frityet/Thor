@@ -41,6 +41,7 @@ add_rules("mode.debug", "mode.release")
 
 add_requires(packages, { debug = is_mode("debug"), configs = { shared = true }, system = false })
 
+
 target("ThorCLI")
 do
     set_kind("binary")
@@ -70,5 +71,13 @@ do
         add_mflags(mflags.release)
         add_ldflags(ldflags.release)
     end
+
+    after_build(function (target)
+        os.cp("$(projectdir)/src/*.lua", target:targetdir())
+    end)
+
+    after_install(function (target)
+        os.cp("$(projectdir)/src/*.lua", target:installdir())
+    end)
 end
 target_end()

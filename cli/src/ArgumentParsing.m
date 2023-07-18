@@ -115,11 +115,20 @@ static id table_to_objc(lua_State *lua)
 
 OFDictionary<OFString *, id> *parse_arguments(lua_State *lua, OFArray<OFString *> *arguments, OFString *progname)
 {
-    auto file = [OFFile fileWithPath: @"cli.lua" mode: @"r"];
+    //find cli.lua next to the executable, and if not that check in the cwd
+    OFFile *file;
+    auto cliPath = $assert_nonnil([[OFApplication.programName stringByDeletingLastPathComponent] stringByAppendingPathComponent: @"cli.lua"]);
+    if ([OFFileManager.defaultManager fileExistsAtPath: cliPath])
+        file = [OFFile fileWithPath: cliPath mode: @"r"];
+    else {
+        cliPath = $assert_nonnil([[OFFileManager.defaultManager currentDirectoryPath] stringByAppendingPathComponent: @"cli.lua"]);
+
+        file = [OFFile fileWithPath: cliPath mode: @"r"];
+    }
     auto data = [OFString stringWithData: [file readDataUntilEndOfStream] encoding: OFStringEncodingUTF8];
     int i = luaL_loadbuffer(lua, data.UTF8String, data.UTF8StringLength, "cli.lua");
     if (i != LUA_OK)
-        @throw [OFLoadPluginFailedException exceptionWithPath: @"cli.lua" error: [OFString stringWithUTF8String: lua_tostring(lua, -1)]];
+        @throw [OFLoadPluginFailedException exceptionWithPath: cliPath error: [OFString stringWithUTF8String: lua_tostring(lua, -1)]];
 
     i = lua_pcall(lua, 0, 0, 0);
     if (i != LUA_OK)

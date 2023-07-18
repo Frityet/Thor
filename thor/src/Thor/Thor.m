@@ -6,21 +6,10 @@
 
 + (OFArray<TSCommunity *> *)communities
 {
-    // static OFMutableArray<TSCommunity *> *communities = nil;
-    // if (communities != nil)
-    //     return communities;
-    // communities = [OFMutableArray array];
-
-    // auto json = (OFDictionary *)[OFString stringWithContentsOfIRI: [OFIRI IRIWithString: $assert_nonnil(TSCommunity.url)]].objectByParsingJSON;
-
-    // auto results = $json_field(json, @"results", OFArray<OFDictionary *>);
-    // for (OFDictionary *result in results)
-    //     [communities addObject: [TSCommunity modelFromJSON: result]];
-
-    // return communities;
-
     OFDictionary<OFString *, id> *json;
-    auto file = TSCache.sharedCache[@"communities"];
+    volatile auto cache = TSCache.sharedCache.cacheFiles;
+    auto file = cache[@"communities"];
+
     if (file == nil) {
         [OFStdOut writeLine: @"Downloading communities..."];
         file = [TSCache.sharedCache createFileNamed: @"communities"];

@@ -7,6 +7,8 @@ typedef struct Version {
     uint32_t patch;
 } OF_BOXABLE Version;
 
+
+__attribute__((used))
 static Version VersionFromString(OFString *_Nonnull str)
 {
     OFArray<OFString *> *components = [str componentsSeparatedByString: @"."];
@@ -18,6 +20,7 @@ static Version VersionFromString(OFString *_Nonnull str)
     };
 }
 
+__attribute__((used))
 static OFString *_Nonnull VersionToString(Version version)
 {
     return [OFString stringWithFormat: @"%u.%u.%u", version.major, version.minor, version.patch];
