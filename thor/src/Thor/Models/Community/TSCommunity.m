@@ -54,6 +54,8 @@
         } else {
             auto resp = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [TSCommunityCategory urlWithParametres: @{ @"community": self.identifier }]]];
             auto json = (OFDictionary *)[resp objectByParsingJSON];
+            file = [TSCache.sharedCache createFileNamed: fname];
+            [file writeString: resp];
 
             auto results = $assert_nonnil($json_field(json, @"results", OFArray<OFDictionary *>));
 
@@ -61,8 +63,7 @@
             for (OFDictionary *result in results)
                 [cats addObject: [TSCommunityCategory modelFromJSON: result]];
 
-            file = [TSCache.sharedCache createFileNamed: fname];
-            [file asyncWriteString: cats.JSONRepresentation];
+
             self->_categories = cats;
         }
     }
@@ -77,21 +78,6 @@
 
     return [TSPackage modelFromJSON: json];
 }
-
-- (OFString *)JSONRepresentationWithOptions:(OFJSONRepresentationOptions)opts
-{
-    return [(@{
-        @"identifier": self.identifier,
-        @"name": self.name,
-        @"discord_url": self.discordURL ?: OFNull.null,
-        @"wiki_url": self.wikiURL ?: OFNull.null,
-        @"require_package_listing_approval": @(self.requirePackageListingApproval),
-        @"categories": self.categories.JSONRepresentation
-    }) JSONRepresentationWithOptions: opts];
-}
-
-- (OFString *)JSONRepresentation
-{ return [self JSONRepresentationWithOptions: OFJSONRepresentationOptionPretty]; }
 
 - (OFString *)description
 {

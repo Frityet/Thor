@@ -13,14 +13,15 @@
     if (file == nil) {
         [OFStdOut writeLine: @"Downloading communities..."];
         file = [TSCache.sharedCache createFileNamed: @"communities"];
-        json = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: $assert_nonnil(TSCommunity.url)]].objectByParsingJSON;
-        json = json[@"results"];
-        [file asyncWriteString: json.JSONRepresentation];
+        auto resp = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: $assert_nonnil(TSCommunity.url)]];
+        [file asyncWriteString: resp];
+        json = resp.objectByParsingJSON;
     } else {
         [OFStdOut writeLine: @"Loading communities from cache..."];
         json = [OFString stringWithData: $assert_nonnil([file readDataUntilEndOfStream]) encoding: OFStringEncodingUTF8].objectByParsingJSON;
     }
 
+    json = json[@"results"];
     auto communities = [OFMutableArray<TSCommunity *> array];
     for (OFDictionary *result in json)
         [communities addObject: [TSCommunity modelFromJSON: result]];

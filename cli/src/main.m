@@ -58,6 +58,7 @@
 
 - (void)applicationDidFinishLaunching: (OFNotification*)notification
 {
+    OFLog(@"Test: %@\n", OFApplication.sharedApplication);
     auto lua = luaL_newstate();
     luaL_openlibs(lua);
     auto arguments = parse_arguments(lua, $assert_nonnil(OFApplication.arguments), $assert_nonnil(OFApplication.programName));

@@ -2,7 +2,7 @@
 
 OF_ASSUME_NONNULL_BEGIN
 
-@protocol ITSModel<OFJSONRepresentation>
+@protocol ITSModel
 
 + (instancetype) modelFromJSON:(OFDictionary *)json;
 - (instancetype) initWithJSON:(OFDictionary *)json;
