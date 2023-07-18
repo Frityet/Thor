@@ -1,41 +1,75 @@
 #include "Common/common.h"
+
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+
 #include "Thor/Thor.h"
+
+#include "ArgumentParsing.h"
 
 @interface ThorCLI : OFObject<OFApplicationDelegate> @end
 
 @implementation ThorCLI
 
+- (id)listWithArguments: (OFDictionary<OFString *, id> *)args
+{
+    [OFStdOut writeLine: @"Listing categories..."];
+    [OFStdOut writeFormat: @"%@\n", args];
+
+    auto communities = Thor.communities;
+    for (TSCommunity *community in communities) {
+        [OFStdOut writeFormat: @"%@\n", community.name];
+        for (TSCommunityCategory *category in community.categories)
+            [OFStdOut writeFormat: @"\t%@\n", category.name];
+    }
+
+    return nil;
+}
+
+- (id)infoWithArguments: (OFDictionary<OFString *, id> *)args
+{
+    [OFStdOut writeLine: @"Getting info..."];
+    [OFStdOut writeFormat: @"%@\n", args];
+
+    return nil;
+}
+
+- (id)updateWithArguments: (OFDictionary<OFString *, id> *)args
+{
+    [OFStdOut writeLine: @"Updating..."];
+    [OFStdOut writeFormat: @"%@\n", args];
+
+    return nil;
+}
+
+- (id)profileWithArguments: (OFDictionary<OFString *, id> *)args
+{
+    [OFStdOut writeLine: @"Getting profile..."];
+    [OFStdOut writeFormat: @"%@\n", args];
+    return nil;
+    // return execute_commands(args, @"profile-command", (struct CommandInformation []) {
+    //     {0}
+    // });
+}
+
 - (void)applicationDidFinishLaunching: (OFNotification*)notification
 {
-    auto args = $assert_nonnil(OFApplication.arguments);
-    auto community = args[0];
+    auto lua = luaL_newstate();
+    luaL_openlibs(lua);
+    auto arguments = parse_arguments(lua, $assert_nonnil(OFApplication.arguments), $assert_nonnil(OFApplication.programName));
 
-    TSCommunity *h3vr;
-    @try {
-        h3vr = [TSCommunity communityFromIdentifier: community];
-    } @catch (OFResolveHostFailedException *ex) {
-        [OFStdErr writeFormat: @"Community %@ not found\n", community];
-        [OFApplication terminateWithStatus: 1];
-    }
+    #define $cmd(x) { .name = @#x, .selector = @selector(x##WithArguments:), .object = self }
+    OFNumber *code = execute_commands(arguments, @"action", (struct CommandInformation []) {
+        $cmd(list),
+        $cmd(info),
+        $cmd(update),
+        $cmd(profile),
+        {0}
+    });
+    #undef $cmd
 
-    auto namespace = args[1];
-    auto name = args[2];
-
-    TSPackage *h3vrUtilities;
-    @try {
-        h3vrUtilities = [h3vr packageWithNamespace: namespace name: name];
-    } @catch(OFHTTPRequestFailedException *ex) {
-        [OFStdErr writeFormat: @"Package %@/%@ in %@ not found\n", namespace, name, community];
-        [OFApplication terminateWithStatus: 1];
-    }
-    // TSPackage *h3vrUtilities = [h3vr packageWithNamespace: namespace name: name];
-
-    [OFStdOut writeFormat: @"%@ v%d.%d.%d\n", h3vrUtilities.name, h3vrUtilities.latest.versionNumber.major, h3vrUtilities.latest.versionNumber.minor, h3vrUtilities.latest.versionNumber.patch];
-    [OFStdOut writeFormat: @"- Description: %@\n", h3vrUtilities.latest.packageDescription];
-    [OFStdOut writeFormat: @"- Download: %@\n", h3vrUtilities.latest.downloadURL];
-    [OFStdOut writeFormat: @"- Website: %@\n", h3vrUtilities.latest.websiteURL];
-
-    [OFApplication terminate];
+    [OFApplication terminateWithStatus: code.unsignedIntValue];
 }
 
 @end

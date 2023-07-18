@@ -2,7 +2,7 @@
 
 OF_ASSUME_NONNULL_BEGIN
 
-@protocol ITSModel
+@protocol ITSModel<OFJSONRepresentation>
 
 + (instancetype) modelFromJSON:(OFDictionary *)json;
 - (instancetype) initWithJSON:(OFDictionary *)json;
@@ -10,6 +10,7 @@ OF_ASSUME_NONNULL_BEGIN
 //For any URL params, this method will be called to generate the URL
 + (OFString *_Nullable)url;
 + (OFString *)urlWithParametres: (OFDictionary<OFString *, OFString *> *)parametres;
+
 
 @end
 

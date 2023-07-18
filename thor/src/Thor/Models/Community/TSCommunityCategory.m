@@ -1,4 +1,5 @@
 #include "TSCommunityCategory.h"
+#include "ObjFW/OFJSONRepresentation.h"
 
 @implementation TSCommunityCategory
 
@@ -23,5 +24,21 @@
 
 + (OFString *)urlWithParametres:(OFDictionary<OFString *,OFString *> *)params
 { return [OFString stringWithFormat: @"https://thunderstore.io/api/experimental/community/%@/category/", params[@"community"]]; }
+
+- (OFString *)JSONRepresentationWithOptions:(OFJSONRepresentationOptions)opts
+{
+    return [(@{
+        @"name": self.name,
+        @"slug": self.slug
+    }) JSONRepresentationWithOptions: opts];
+}
+
+- (OFString *)JSONRepresentation
+{ return [self JSONRepresentationWithOptions: OFJSONRepresentationOptionPretty]; }
+
+- (OFString *)description
+{
+    return [OFString stringWithFormat: @"<%@: %@>", self.className, self.JSONRepresentation];
+}
 
 @end

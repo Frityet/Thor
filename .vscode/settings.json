@@ -1,6 +1,7 @@
 {
     "Lua.workspace.library": [
-        "/Users/frityet/Library/Application Support/Code/User/globalStorage/sumneko.lua/addonManager/addons/xmake/module/library"
+        "/Users/frityet/Library/Application Support/Code/User/globalStorage/sumneko.lua/addonManager/addons/xmake/module/library",
+        "/Users/frityet/Library/Application Support/Code/User/globalStorage/sumneko.lua/addonManager/addons/argparse/module/library"
     ],
     "Lua.runtime.version": "Lua 5.4",
     "Lua.workspace.checkThirdParty": false,

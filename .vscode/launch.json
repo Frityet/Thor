@@ -9,9 +9,13 @@
             "request": "launch",
             "name": "Debug",
             "program": "${workspaceFolder}/build/macosx/x86_64/debug/thorcli",
-            "args": [],
-            "cwd": "${workspaceFolder}",
-            "preLaunchTask": "Build"
+            "args": [
+                "list",
+                "h3vr"
+            ],
+            "cwd": "${workspaceFolder}/cli/src",
+            "preLaunchTask": "Build",
+            "console": "internalConsole"
         }
     ]
 }

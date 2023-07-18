@@ -43,4 +43,28 @@
 + (OFString *)urlWithParametres:(OFDictionary<OFString *,OFString *> *)params
 { return [OFString stringWithFormat: @"https://%@.thunderstore.io/api/experimental/package/%@/%@/", params[@"community"], params[@"namespace"], params[@"name"]]; }
 
+- (OFString *)JSONRepresentationWithOptions:(OFJSONRepresentationOptions)opts
+{
+    return [(@{
+        @"namespace": self.namespace,
+        @"name": self.name,
+        @"full_name": self.fullName,
+        @"owner": self.owner,
+        @"package_url": self.packageURL,
+        @"date_created": self.dateCreated,
+        @"date_updated": self.dateUpdated,
+        @"rating_score": @(self.ratingScore),
+        @"is_pinned": @(self.isPinned),
+        @"is_deprecated": @(self.isDeprecated),
+        @"total_downloads": @(self.totalDownloads),
+        @"latest": self.latest
+    }) JSONRepresentationWithOptions: opts];
+}
+
+- (OFString *)JSONRepresentation
+{ return [self JSONRepresentationWithOptions: OFJSONRepresentationOptionPretty]; }
+
+- (OFString *)description
+{ return [OFString stringWithFormat: @"<TSPackage: %@>", self.fullName]; }
+
 @end

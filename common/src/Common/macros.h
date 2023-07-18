@@ -6,3 +6,11 @@
         @throw [OFInvalidArgumentException exception]; \
     _; \
 }))
+
+#define $assert_type(x, y) ({ \
+    auto _ = (x); \
+    if (![_ isKindOfClass: [y class]]) \
+        @throw [OFInvalidArgumentException exception]; \
+    _; \
+})
+#define $SelectorFunction(ret, ...) typeof(ret(id, SEL, __VA_ARGS__))

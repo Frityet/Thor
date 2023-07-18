@@ -1,4 +1,5 @@
 #include "TSCommunity.h"
+#include "ObjFW/OFJSONRepresentation.h"
 
 
 @implementation TSCommunity
@@ -57,6 +58,26 @@
     auto json = (OFDictionary *)[resp objectByParsingJSON];
 
     return [TSPackage modelFromJSON: json];
+}
+
+- (OFString *)JSONRepresentationWithOptions:(OFJSONRepresentationOptions)opts
+{
+    return [(@{
+        @"identifier": self.identifier,
+        @"name": self.name,
+        @"discord_url": self.discordURL ?: OFNull.null,
+        @"wiki_url": self.wikiURL ?: OFNull.null,
+        @"require_package_listing_approval": @(self.requirePackageListingApproval),
+        @"categories": self.categories.JSONRepresentation
+    }) JSONRepresentationWithOptions: opts];
+}
+
+- (OFString *)JSONRepresentation
+{ return [self JSONRepresentationWithOptions: OFJSONRepresentationOptionPretty]; }
+
+- (OFString *)description
+{
+    return [OFString stringWithFormat: @"<%@: %@>", self.className, self.identifier];
 }
 
 @end
