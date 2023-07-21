@@ -1,4 +1,5 @@
 #include "TSCache.h"
+#include "ObjFW/OFSeekableStream.h"
 
 @implementation IRINotFoundException
 
@@ -26,7 +27,7 @@
 {
     static TSCache *cache = nil;
     if (cache == nil)
-        cache = [self cacheWithDirectory: [[OFFileManager.defaultManager currentDirectoryIRI] IRIByAppendingPathComponent: @"cache"]];
+        cache = [self cacheWithDirectory: [OFFileManager.defaultManager.currentDirectoryIRI IRIByAppendingPathComponent: @"cache"]];
     return cache;
 }
 
@@ -71,18 +72,44 @@
 - (OFFile *)createFileNamed: (OFString *)name withContents: (OFString *)contents
 {
     auto file = [self createFileNamed: name];
-    [file seekToOffset: 0 whence: OFSeekSet];
     [file writeString: contents];
+    [file seekToOffset: 0 whence: OFSeekEnd];
     return file;
 }
 
+- (void)removeFileNamed: (OFString *)name
+{
+    if (self->_cache[name] == nil)
+        @throw [IRINotFoundException exceptionWithIRI: [_directory IRIByAppendingPathComponent: name]];
+
+    [OFFileManager.defaultManager removeItemAtPath: [_directory IRIByAppendingPathComponent: name].path];
+    [self->_cache removeObjectForKey: name];
+    self->_cache[name] = nil;
+}
+
+- (void)clear
+{
+    for (OFString *file in self->_cache)
+        [OFFileManager.defaultManager removeItemAtPath: [_directory IRIByAppendingPathComponent: file].path];
+
+    [self->_cache removeAllObjects];
+}
+
 - (OFFile *)objectForKeyedSubscript: (OFString *)key
-{ return self->_cache[key]; }
+{
+    auto f = self->_cache[key];
+    [f seekToOffset: 0 whence: OFSeekEnd];
+    return f;
+}
 
 - (void)setObject: (OFString *)str forKeyedSubscript: (OFString *)key
 {
+    if (str == nil) {
+        [self removeFileNamed: key];
+        return;
+    }
+
     auto file = [self createFileNamed: key];
-    [file seekToOffset: 0 whence: OFSeekSet];
     [file writeString: str];
 }
 

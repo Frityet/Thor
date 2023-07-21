@@ -47,7 +47,7 @@
 
 @end
 
-id _Nullable get_json_field(OFDictionary *json, OFString *key, Class type)
+id _Nullable getJSONField(OFDictionary *json, OFString *key, Class type)
 {
     id value = json[key];
     if (value == nil)

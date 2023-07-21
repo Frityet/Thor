@@ -1,5 +1,7 @@
 #import "Common/common.h"
 
+#import "Thor/OFMutableString+FormattingExtensions.h"
+
 OF_ASSUME_NONNULL_BEGIN
 
 @protocol ITSSerializable
@@ -23,6 +25,8 @@ OF_ASSUME_NONNULL_BEGIN
 + (OFString *_Nullable)url;
 + (OFString *)urlWithParametres: (OFDictionary<OFString *, OFString *> *)parametres;
 
+- (OFString *)formattedDescription;
+- (OFString *)formattedDescriptionWithIndentationLevel: (size_t)level;
 
 @end
 

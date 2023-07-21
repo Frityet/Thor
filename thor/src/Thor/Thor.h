@@ -9,6 +9,7 @@ __attribute__((objc_root_class))
 @property (class, readonly) OFArray<TSCommunity *> *communities;
 
 + (TSCommunity *_Nullable)communityWithSlug: (OFString *)slug;
++ (void)updateDatabase;
 
 @end
 

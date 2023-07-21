@@ -1,6 +1,6 @@
 #include "Thor/Models/ITSModel.h"
 
-#include "TSPackageVersion.h"
+#include "TSModVersion.h"
 
 OF_ASSUME_NONNULL_BEGIN
 
@@ -18,7 +18,9 @@ OF_ASSUME_NONNULL_BEGIN
 @property(atomic, readonly) bool isDeprecated;
 @property(atomic, readonly) bool hasNSFWContent;
 @property(atomic, readonly) OFArray<OFString *> *categories;
-@property(atomic, readonly) OFArray<TSPackageVersion *> *versions;
+@property(atomic, readonly) OFArray<TSModVersion *> *versions;
+
+- (OFString *)formattedDescriptionWithIndentationLevel:(size_t)level showVersions: (bool)showVersions;
 
 @end
 

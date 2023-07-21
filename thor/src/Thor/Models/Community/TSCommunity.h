@@ -1,7 +1,7 @@
 #import "Common/common.h"
 
 #import "Thor/Models/ITSModel.h"
-#import "Thor/Models/Package/TSPackage.h"
+#import "Thor/Models/Mod/TSMod.h"
 
 #import "TSCommunityCategory.h"
 

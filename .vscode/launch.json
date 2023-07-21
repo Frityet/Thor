@@ -12,7 +12,36 @@
             "args": [
                 "list",
                 "h3vr",
-                "mods"
+                "mods",
+                "-x", "nsfw", "modpack",
+                "-c", "maps",
+                // "-n", "sora"
+            ],
+            "cwd": "${workspaceFolder}/cli/src",
+            "preLaunchTask": "Build",
+            "console": "internalConsole"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Info",
+            "program": "${workspaceFolder}/build/macosx/x86_64/debug/thorcli",
+            "args": [
+                "info",
+                "h3vr",
+                "h3",
+            ],
+            "cwd": "${workspaceFolder}/cli/src",
+            "preLaunchTask": "Build",
+            "console": "internalConsole"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Update",
+            "program": "${workspaceFolder}/build/macosx/x86_64/debug/thorcli",
+            "args": [
+                "update", "database", "-f"
             ],
             "cwd": "${workspaceFolder}/cli/src",
             "preLaunchTask": "Build",

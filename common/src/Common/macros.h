@@ -7,12 +7,13 @@
     _x; \
 }))
 
-#define $assert_type(x, y) (typeof(y) *_Nonnull)({ \
+#define $assert_type(x, y) ((typeof(y) *_Nonnull)({ \
     id _x = (x); \
     if (!(_x && [_x isKindOfClass: [y class]])) \
         @throw [OFInvalidArgumentException exception]; \
     _x; \
-})
+}))
+
 #define $SelectorFunction(ret, ...) typeof(ret(id, SEL, __VA_ARGS__))
 
 #if defined(__cplusplus)

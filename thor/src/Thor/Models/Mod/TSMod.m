@@ -1,6 +1,8 @@
-#include "TSPackage.h"
+#include "TSMod.h"
 
-@implementation TSMod
+@implementation TSMod {
+    OFMutableArray<TSModVersion *> *_versions;
+}
 
 + (instancetype)modelFromJSON:(OFDictionary *)json
 { return [[self alloc] initWithJSON: json]; }
@@ -31,9 +33,9 @@
     self->_hasNSFWContent = $assert_nonnil($json_field(json, @"has_nsfw_content", OFNumber)).boolValue;
     self->_categories = $assert_nonnil($json_field(json, @"categories", OFArray<OFString *>));
 
-    auto versions = [OFMutableArray array];
+    self->_versions = [OFMutableArray array];
     for (OFDictionary *ver in $assert_nonnil($json_field(json, @"versions", OFArray<OFDictionary *>)))
-        [versions addObject: [TSPackageVersion modelFromJSON: ver]];
+        [self->_versions addObject: [TSModVersion modelFromJSON: ver]];
 
     return self;
 }
@@ -57,5 +59,38 @@
 
 - (OFString *)description
 { return [OFString stringWithFormat: @"<TSPackage: %@>", self.fullName]; }
+
+- (OFString *)formattedDescription
+{ return [self formattedDescriptionWithIndentationLevel: 0]; }
+
+- (OFString *)formattedDescriptionWithIndentationLevel:(size_t)level
+{ return [self formattedDescriptionWithIndentationLevel: level showVersions: true]; }
+
+- (OFString *)formattedDescriptionWithIndentationLevel:(size_t)level showVersions: (bool)showVersions
+{
+    auto str = [OFMutableString string];
+    [str appendWithIndentationLevel: level format: @"Name: %@\n", self.name];
+    [str appendWithIndentationLevel: level format: @"Full Name: %@\n", self.fullName];
+    [str appendWithIndentationLevel: level format: @"Owner: %@\n", self.owner];
+    [str appendWithIndentationLevel: level format: @"URL: %@\n", self.packageURL.string];
+    [str appendWithIndentationLevel: level format: @"Date Created: %@\n", self.dateCreated];
+    [str appendWithIndentationLevel: level format: @"Date Updated: %@\n", self.dateUpdated];
+    [str appendWithIndentationLevel: level format: @"Rating Score: %u\n", self.ratingScore];
+    [str appendWithIndentationLevel: level format: @"Is Pinned: %@\n", self.isPinned ? @"Yes" : @"No"];
+    [str appendWithIndentationLevel: level format: @"Is Deprecated: %@\n", self.isDeprecated ? @"Yes" : @"No"];
+    [str appendWithIndentationLevel: level format: @"Has NSFW Content: %@\n", self.hasNSFWContent ? @"Yes" : @"No"];
+    [str appendWithIndentationLevel: level format: @"Categories:\n"];
+    for (OFString *cat in self.categories)
+        [str appendWithIndentationLevel: level + 2 format: @"- %@\n", cat];
+
+    if (showVersions) {
+        [str appendWithIndentationLevel: level format: @"Versions: \n"];
+        for (TSModVersion *ver in self.versions)
+            [str appendString: [ver formattedDescriptionWithIndentationLevel: level + 2]];
+    }
+
+    [str makeImmutable];
+    return str;
+}
 
 @end

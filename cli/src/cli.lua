@@ -26,6 +26,13 @@ function ParseArguments(args, program_name)
 
             ---@diagnostic disable-next-line: param-type-mismatch
             cmd:option {
+                name = "-v --versions",
+                description = "Show versions of mods",
+                args = 0
+            }
+
+            ---@diagnostic disable-next-line: param-type-mismatch
+            cmd:option {
                 name = "-c --category",
                 args = "+"
             }
@@ -40,7 +47,8 @@ function ParseArguments(args, program_name)
             ---@diagnostic disable-next-line: param-type-mismatch
             cmd:option {
                 name = "-n --name",
-                args = "+"
+                args = "+",
+                description = "Filter by mod name"
             }
 
             ---@diagnostic disable-next-line: param-type-mismatch
@@ -76,6 +84,13 @@ function ParseArguments(args, program_name)
                     "mods"
                 },
                 default = "database"
+            }
+
+            ---@diagnostic disable-next-line: param-type-mismatch
+            cmd:option {
+                name = "-f --fetch-mods",
+                description = "Fetch mods from thunderstore",
+                args = 0
             }
 
             ---@diagnostic disable-next-line: param-type-mismatch

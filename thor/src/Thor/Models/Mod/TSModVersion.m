@@ -1,6 +1,6 @@
-#include "TSPackageVersion.h"
+#include "TSModVersion.h"
 
-@implementation TSPackageVersion
+@implementation TSModVersion
 
 + (instancetype)modelFromJSON:(OFDictionary *)json
 { return [[self alloc] initWithJSON: json]; }
@@ -48,6 +48,31 @@
 { return [OFString stringWithFormat: @"https://%@.thunderstore.io/api/experimental/package/%@/%@/%@/", params[@"community"], params[@"author"], params[@"name"], params[@"version"]]; }
 
 - (OFString *)description
-{ return [OFString stringWithFormat: @"<TSPackageVersion: %@>", self.fullName]; }
+{ return [OFString stringWithFormat: @"<TSModVersion: %@>", self.fullName]; }
+
+- (OFString *)formattedDescription
+{ return [self formattedDescriptionWithIndentationLevel: 0]; }
+
+- (OFString *)formattedDescriptionWithIndentationLevel:(size_t)level
+{
+    auto str = [OFMutableString string];
+
+    [str appendWithIndentationLevel: level format: @"Name: %@\n", self.name];
+    [str appendWithIndentationLevel: level format: @"Full Name: %@\n", self.fullName];
+    [str appendWithIndentationLevel: level format: @"Description: %@\n", self.packageDescription];
+    [str appendWithIndentationLevel: level format: @"Icon: %@\n", self.icon];
+    [str appendWithIndentationLevel: level format: @"Version: %@\n", VersionToString(self.versionNumber)];
+    [str appendWithIndentationLevel: level format: @"Dependencies:\n"];
+    for (OFString *dep in self.dependencies)
+        [str appendWithIndentationLevel: level + 2 format: @"- %@\n", dep];
+    [str appendWithIndentationLevel: level format: @"Download URL: %@\n", self.downloadURL.string];
+    [str appendWithIndentationLevel: level format: @"Downloads: %u\n", self.downloads];
+    [str appendWithIndentationLevel: level format: @"Date Created: %@\n", self.dateCreated];
+    [str appendWithIndentationLevel: level format: @"Website URL: %@\n", self.websiteURL.string];
+    [str appendWithIndentationLevel: level format: @"Is Active: %@\n", self.isActive ? @"true" : @"false"];
+
+    [str makeImmutable];
+    return str;
+}
 
 @end

@@ -44,7 +44,6 @@ do
     add_packages(packages)
 
     add_files("src/**.m")
-    add_files("src/**.mm")
     add_headerfiles("src/**.h")
     set_pmheader("src/Common/common.h")
 

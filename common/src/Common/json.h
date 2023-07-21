@@ -20,8 +20,8 @@ OF_ASSUME_NONNULL_BEGIN
 
 @end
 
-id _Nullable get_json_field(OFDictionary *json, OFString *key, Class type);
+id _Nullable getJSONField(OFDictionary *json, OFString *key, Class type);
 
-#define $json_field(json, key, type) ((type *_Nullable)get_json_field(json, key, [type class]))
+#define $json_field(json, key, type) ((type *_Nullable)getJSONField(json, key, [type class]))
 
 OF_ASSUME_NONNULL_END

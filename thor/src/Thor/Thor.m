@@ -16,7 +16,8 @@
         [file writeString: resp];
         json = resp.objectByParsingJSON;
     } else {
-        json = [OFString stringWithData: $assert_nonnil([file readDataUntilEndOfStream]) encoding: OFStringEncodingUTF8].objectByParsingJSON;
+        auto data = [OFString stringWithData: $assert_nonnil([file readDataUntilEndOfStream]) encoding: OFStringEncodingUTF8];
+        json = data.objectByParsingJSON;
     }
 
     json = json[@"results"];
@@ -36,6 +37,12 @@
             return community;
 
     return nil;
+}
+
++ (void)updateDatabase
+{
+    [TSCache.sharedCache clear];
+    [self communities]; //Load communities
 }
 
 @end

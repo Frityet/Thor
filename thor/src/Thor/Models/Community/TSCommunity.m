@@ -78,7 +78,7 @@
         auto file = TSCache.sharedCache[fname];
         if (file != nil) {
             #if PROJECT_DEBUG
-            [OFStdOut writeFormat: @"Parsing %@ from cache as JSON, on debug builds this can take EXTREMLEY LONG...\n", fname];
+            [OFStdOut writeFormat: @"Parsing %@ from cache as JSON...\n", fname];
 
             auto date = [OFDate date];
             #endif
@@ -101,11 +101,8 @@
             [file writeString: resp];
 
             #if PROJECT_DEBUG
-            [OFStdOut writeFormat: @"Reading %@ from cache, on debug builds this can take EXTREMLEY LONG...\n", fname];
+            [OFStdOut writeFormat: @"Reading %@ from cache...\n", fname];
             auto date = [OFDate date];
-            [[OFTimer timerWithTimeInterval: 1000 repeats: true block: ^(OFTimer *timer){
-                [OFStdOut writeFormat: @"%f seconds elapsed...\r", date.timeIntervalSinceNow * -1];
-            }] fire];
             #endif
 
             auto json = $assert_type(resp.objectByParsingJSON, OFArray<OFDictionary *>);
@@ -143,6 +140,23 @@
 - (OFString *)description
 {
     return [OFString stringWithFormat: @"<%@: %@>", self.className, self.identifier];
+}
+
+- (OFString *)formattedDescription
+{ return [self formattedDescriptionWithIndentationLevel: 0]; }
+
+- (OFString *)formattedDescriptionWithIndentationLevel:(size_t)level
+{
+    auto str = [OFMutableString string];
+
+    [str appendWithIndentationLevel: level format: @"Identifier: %@\n", self.identifier];
+    [str appendWithIndentationLevel: level format: @"Name: %@\n", self.name];
+    [str appendWithIndentationLevel: level format: @"Discord URL: %@\n", self.discordURL];
+    [str appendWithIndentationLevel: level format: @"Wiki URL: %@\n", self.wikiURL];
+    [str appendWithIndentationLevel: level format: @"Require Package Listing Approval: %@\n", self.requirePackageListingApproval ? @"Yes" : @"No"];
+    [str appendWithIndentationLevel: level format: @"Categories: %@\n", self.categories];
+
+    return str;
 }
 
 @end

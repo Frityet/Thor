@@ -5,7 +5,9 @@ local packages = {
     "lua",
 }
 
-local sanitizers = { "address", "leak", "undefined" }
+local sanitizers = {
+    -- "address", "leak", "undefined"
+}
 
 local mflags = {
     release = {},

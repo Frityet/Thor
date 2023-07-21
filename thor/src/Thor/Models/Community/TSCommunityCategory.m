@@ -30,4 +30,17 @@
     return [OFString stringWithFormat: @"<%@: %@>", self.className, self.slug];
 }
 
+- (OFString *)formattedDescription
+{ return [self formattedDescriptionWithIndentationLevel: 0]; }
+
+- (OFString *)formattedDescriptionWithIndentationLevel:(size_t)level
+{
+    auto str = [OFMutableString string];
+
+    [str appendWithIndentationLevel: level format: @"Name: %@\n", self.name];
+    [str appendWithIndentationLevel: level format: @"Slug: %@\n", self.slug];
+
+    return str;
+}
+
 @end

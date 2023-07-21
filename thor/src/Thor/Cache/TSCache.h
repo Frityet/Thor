@@ -25,8 +25,11 @@ OF_ASSUME_NONNULL_BEGIN
 - (OFFile __weak *)createFileNamed: (OFString *)name;
 - (OFFile __weak *)createFileNamed: (OFString *)name withContents: (OFString *)contents;
 
+- (void)removeFileNamed: (OFString *)name;
+- (void)clear;
+
 - (OFFile *_Nullable)objectForKeyedSubscript: (OFString *)key;
-- (void)setObject: (OFString *)str forKeyedSubscript: (OFString *)key;
+- (void)setObject: (OFString *_Nullable)str forKeyedSubscript: (OFString *)key;
 
 @end
 
