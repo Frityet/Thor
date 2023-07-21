@@ -1,9 +1,7 @@
-includes("../packages.lua", "../common")
+includes("../common")
 
 --Config:
 local packages = {
-    "objfw-local",
-    "simdjson"
 }
 
 local sanitizers = { }
@@ -44,7 +42,7 @@ add_requires(packages, { configs = { shared = true }, system = false })
 
 target("Thor")
 do
-    set_kind("shared")
+    set_kind(is_kind("static") and "static" or "shared")
     add_packages(packages)
 
     add_files("src/**.m")

@@ -2,26 +2,6 @@
 
 #include "TSPackageVersion.h"
 
-/*
-  {
-    "name": "RavenM",
-    "full_name": "RavenM-RavenM",
-    "owner": "RavenM",
-    "package_url": "https://ravenfield.thunderstore.io/package/RavenM/RavenM/",
-    "date_created": "2022-08-19T19:40:25.481269Z",
-    "date_updated": "2022-08-19T19:40:25.978746Z",
-    "uuid4": "f7099f79-5f20-408d-b7d3-ce31ca695bc2",
-    "rating_score": 1,
-    "is_pinned": false,
-    "is_deprecated": false,
-    "has_nsfw_content": false,
-    "categories": [
-      "Mods",
-      "Misc"
-    ],
-    "versions": [
-*/
-
 OF_ASSUME_NONNULL_BEGIN
 
 @interface TSMod : OFObject<ITSModel>

@@ -2,7 +2,10 @@
 #include "Thor/Cache/TSCache.h"
 
 
-@implementation TSCommunity
+@implementation TSCommunity {
+    OFMutableArray<TSCommunityCategory *> *_categories;
+    OFMutableArray<TSMod *> *_mods;
+}
 
 @synthesize categories = _categories;
 @synthesize mods = _mods;
@@ -46,11 +49,9 @@
 
             auto results = $assert_nonnil($json_field(json, @"results", OFArray<OFDictionary *>));
 
-            auto cats = [OFMutableArray array];
+            self->_categories = [OFMutableArray arrayWithCapacity: results.count];
             for (OFDictionary *result in results)
-                [cats addObject: [TSCommunityCategory modelFromJSON: result]];
-
-            self->_categories = cats;
+                [self->_categories addObject: [TSCommunityCategory modelFromJSON: result]];
         } else {
             auto resp = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [TSCommunityCategory urlWithParametres: @{ @"community": self.identifier }]]];
             auto json = (OFDictionary *)[resp objectByParsingJSON];
@@ -59,12 +60,9 @@
 
             auto results = $assert_nonnil($json_field(json, @"results", OFArray<OFDictionary *>));
 
-            auto cats = [OFMutableArray array];
+            self->_categories = [OFMutableArray arrayWithCapacity: results.count];
             for (OFDictionary *result in results)
-                [cats addObject: [TSCommunityCategory modelFromJSON: result]];
-
-
-            self->_categories = cats;
+                [self->_categories addObject: [TSCommunityCategory modelFromJSON: result]];
         }
     }
 
@@ -79,28 +77,45 @@
 
         auto file = TSCache.sharedCache[fname];
         if (file != nil) {
-            [OFStdOut writeLine: @"Loading cached mods (for large communities, this will take a long time)..."];
+            #if PROJECT_DEBUG
+            [OFStdOut writeFormat: @"Parsing %@ from cache as JSON, on debug builds this can take EXTREMLEY LONG...\n", fname];
+
+            auto date = [OFDate date];
+            #endif
+
             auto json = (OFArray *)[OFString stringWithData: $assert_nonnil([file readDataUntilEndOfStream]) encoding: OFStringEncodingUTF8].objectByParsingJSON;
 
-            auto pkgs = [OFMutableArray array];
+            #if PROJECT_DEBUG
+            [OFStdOut writeFormat: @"\rParsed %@ (%d entries) from cache as JSON in %f seconds.\n", fname, json.count, date.timeIntervalSinceNow * -1];
+            #endif
+
+            self->_mods = [OFMutableArray<TSMod *> arrayWithCapacity: json.count];
             for (OFDictionary *result in json)
-                [pkgs addObject: [TSMod modelFromJSON: result]];
-
-            self->_mods = pkgs;
+                [self->_mods addObject: [TSMod modelFromJSON: result]];
         } else {
-            [OFStdOut writeLine: @"Downloading and caching mods (for large communities, this will take a long time)..."];
-            self->_mods = [OFMutableArray array];
+            auto url = [OFIRI IRIWithString: [TSMod urlWithParametres: @{ @"community": self.identifier }]];
+            [OFStdOut writeFormat: @"Fetching %@ from %@...\n", fname, url.string];
 
-            //this endpoint just returns a json array of all packages in the community
-            auto resp = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [TSMod urlWithParametres: @{ @"community": self.identifier }]]];
+            auto resp = [OFString stringWithContentsOfIRI: url];
             file = [TSCache.sharedCache createFileNamed: fname];
             [file writeString: resp];
 
-            auto pkgs = [OFMutableArray array];
-            for (OFDictionary *result in resp.objectByParsingJSON)
-                [pkgs addObject: [TSMod modelFromJSON: result]];
+            #if PROJECT_DEBUG
+            [OFStdOut writeFormat: @"Reading %@ from cache, on debug builds this can take EXTREMLEY LONG...\n", fname];
+            auto date = [OFDate date];
+            [[OFTimer timerWithTimeInterval: 1000 repeats: true block: ^(OFTimer *timer){
+                [OFStdOut writeFormat: @"%f seconds elapsed...\r", date.timeIntervalSinceNow * -1];
+            }] fire];
+            #endif
 
-            self->_mods = pkgs;
+            auto json = $assert_type(resp.objectByParsingJSON, OFArray<OFDictionary *>);
+            self->_mods = [OFMutableArray<TSMod *> arrayWithCapacity: json.count];
+            for (OFDictionary *result in json)
+                [self->_mods addObject: [TSMod modelFromJSON: result]];
+
+            #if PROJECT_DEBUG
+            [OFStdOut writeFormat: @"Read %@ (%d entries) from cache in %f seconds.\n", fname, self->_mods.count, date.timeIntervalSinceNow * -1];
+            #endif
         }
     }
 

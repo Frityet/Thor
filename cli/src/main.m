@@ -24,8 +24,7 @@
         for (TSCommunityCategory *category in community.categories)
             [OFStdOut writeFormat: @"%@\n", category.name];
     } else if ([args[@"scope"] isEqual: @"mods"]) {
-        for (TSMod *mod in community.mods)
-            [OFStdOut writeFormat: @"%@\n", mod.name];
+        [community mods];
     }
 
     return @(0);
@@ -52,19 +51,16 @@
     [OFStdOut writeLine: @"Getting profile..."];
     [OFStdOut writeFormat: @"%@\n", args];
     return @(0);
-    // return execute_commands(args, @"profile-command", (struct CommandInformation []) {
-    //     {0}
-    // });
 }
 
 - (void)applicationDidFinishLaunching: (OFNotification*)notification
 {
     auto lua = luaL_newstate();
     luaL_openlibs(lua);
-    auto arguments = parse_arguments(lua, $assert_nonnil(OFApplication.arguments), $assert_nonnil(OFApplication.programName));
+    auto arguments = parseArguments(lua, $assert_nonnil(OFApplication.arguments), $assert_nonnil(OFApplication.programName));
 
     #define $cmd(x) { .name = @#x, .selector = @selector(x##WithArguments:), .object = self }
-    OFNumber *code = execute_commands(arguments, @"action", (struct CommandInformation []) {
+    OFNumber *code = executeCommands(arguments, @"action", (struct CommandInformation []) {
         $cmd(list),
         $cmd(info),
         $cmd(update),

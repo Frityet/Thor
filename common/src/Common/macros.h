@@ -1,17 +1,17 @@
 #define auto __auto_type
 
 #define $assert_nonnil(...) ((typeof(*(__VA_ARGS__)) *_Nonnull)({ \
-    auto _ = (__VA_ARGS__); \
-    if (_ == nil) \
+    auto _x = (__VA_ARGS__); \
+    if (_x == nil) \
         @throw [OFInvalidArgumentException exception]; \
-    _; \
+    _x; \
 }))
 
-#define $assert_type(x, y) ({ \
-    id _ = (x); \
-    if (!(_ && [_ isKindOfClass: [y class]])) \
+#define $assert_type(x, y) (typeof(y) *_Nonnull)({ \
+    id _x = (x); \
+    if (!(_x && [_x isKindOfClass: [y class]])) \
         @throw [OFInvalidArgumentException exception]; \
-    _; \
+    _x; \
 })
 #define $SelectorFunction(ret, ...) typeof(ret(id, SEL, __VA_ARGS__))
 

@@ -1,8 +1,7 @@
-includes("../packages.lua", "../thor", "../common")
+includes("../thor", "../common")
 
 --Config:
 local packages = {
-    "objfw-local",
     "lua",
 }
 
@@ -40,7 +39,7 @@ set_languages {
 
 add_rules("mode.debug", "mode.release")
 
-add_requires(packages, { debug = is_mode("debug"), configs = { shared = true }, system = false })
+add_requires(packages, { debug = is_mode("debug"), configs = { shared = is_kind("shared") }, system = false })
 
 
 target("ThorCLI")

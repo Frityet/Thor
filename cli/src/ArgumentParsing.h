@@ -23,8 +23,8 @@ struct CommandInformation {
 ///
 /// Using the lua argparse library, parse the arguments passed to the program.
 ///
-OFDictionary<OFString *, id> *parse_arguments(lua_State *lua, OFArray<OFString *> *arguments, OFString *progname);
+OFDictionary<OFString *, id> *parseArguments(lua_State *lua, OFArray<OFString *> *arguments, OFString *progname);
 
-id _Nullable execute_commands(OFDictionary<OFString *, id> *args, OFConstantString *actionKey, struct CommandInformation commands[]);
+id _Nullable executeCommands(OFDictionary<OFString *, id> *args, OFConstantString *actionKey, struct CommandInformation commands[_Nonnull]);
 
 OF_ASSUME_NONNULL_END

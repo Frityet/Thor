@@ -60,14 +60,11 @@ package("objfw-local")
         if type(tls) == "boolean" then
             tls = tls and "yes" or "no"
         end
-        table.insert(configs, "--enable-tls=" .. tls)
-        if package:is_debug() then
-            table.insert(configs, "--enable-debug")
-        end
+        table.insert(configs, "--with-tls=" .. tls)
         table.insert(configs, "--enable-shared=" .. (package:config("shared") and "yes" or "no"))
         table.insert(configs, "--enable-static=" .. (package:config("shared") and "no" or "yes"))
         for name, enabled in pairs(package:configs()) do
-            if not package:extraconf("configs", name, "builtin") then
+            if not package:extraconf("configs", name, "builtin") and name ~= "arc" then
                 name = name:gsub("_", "-")
                 if enabled then
                     table.insert(configs, "--enable-" .. name)
@@ -78,28 +75,18 @@ package("objfw-local")
         end
         import("package.tools.autoconf").install(package, configs)
 
+        local mflags = {}
+        local mxxflags = {}
         local ldflags = {}
-        local objcflags = {}
-        local objcxxflags = {}
         local objfwcfg = path.join(package:installdir("bin"), "objfw-config")
-        local objcflags_str = os.iorunv(objfwcfg, {"--cflags", "--cppflags", "--objcflags", (package:config("arc") and "--arc" or "")})
-        local objcxxflags_str = os.iorunv(objfwcfg, {"--cxxflags", "--cppflags", "--objcflags", (package:config("arc") and "--arc" or "")})
+        local mflags_str = os.iorunv(objfwcfg, {"--cflags", "--cppflags", "--objcflags", (package:config("arc") and "--arc" or "")})
+        local mxxflags_str = os.iorunv(objfwcfg, {"--cxxflags", "--cppflags", "--objcflags", (package:config("arc") and "--arc" or "")})
         local ldflags_str = os.iorunv(objfwcfg, {"--ldflags"})
-        for _, flag in ipairs(objcflags_str:split("%s+")) do
-            table.insert(objcflags, flag)
-        end
-        for _, flag in ipairs(objcxxflags_str:split("%s+")) do
-            table.insert(objcxxflags, flag)
-        end
-        for _, flag in ipairs(ldflags_str:split("%s+")) do
-            table.insert(ldflags, flag)
-        end
-        package:add("mflags", objcflags)
-
-        table.insert(objcxxflags, "-DThisIsA=\"TEST\"")
-
-        --does not work?
-        package:add("mxxflags", objcxxflags)
+        table.join2(mflags, mflags_str:split("%s+"))
+        table.join2(mxxflags, mxxflags_str:split("%s+"))
+        table.join2(ldflags, ldflags_str:split("%s+"))
+        package:add("mflags", mflags)
+        package:add("mxxflags", mxxflags)
         package:add("ldflags", ldflags)
     end)
 

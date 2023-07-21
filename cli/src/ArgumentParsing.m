@@ -29,9 +29,9 @@
 
 @end
 
-static id table_to_objc(lua_State *lua);
+static id tableToObjC(lua_State *lua);
 
-static OFArray *handle_array(lua_State *lua)
+static OFArray *handleArray(lua_State *lua)
 {
     OFMutableArray *array = [OFMutableArray array];
     lua_pushnil(lua);
@@ -48,7 +48,7 @@ static OFArray *handle_array(lua_State *lua)
                 value = [OFString stringWithUTF8String: lua_tostring(lua, -1)];
                 break;
             case LUA_TTABLE:
-                value = table_to_objc(lua);
+                value = tableToObjC(lua);
                 break;
             default:
                 @throw [OFInvalidArgumentException exception];
@@ -59,9 +59,9 @@ static OFArray *handle_array(lua_State *lua)
     return array;
 }
 
-static OFDictionary<OFString *, id> *handle_dictionary(lua_State *lua)
+static OFDictionary<OFString *, id> *handleDictionary(lua_State *lua)
 {
-    OFMutableDictionary<OFString *, id> *dictionary = [OFMutableDictionary dictionary];
+    auto dictionary = [OFMutableDictionary<OFString *, id> dictionary];
     lua_pushnil(lua);
     while (lua_next(lua, -2) != 0) {
         id key = nil;
@@ -90,7 +90,7 @@ static OFDictionary<OFString *, id> *handle_dictionary(lua_State *lua)
                 value = [OFString stringWithUTF8String: lua_tostring(lua, -1)];
                 break;
             case LUA_TTABLE:
-                value = table_to_objc(lua);
+                value = tableToObjC(lua);
                 break;
             default:
                 @throw [OFInvalidArgumentException exception];
@@ -101,19 +101,19 @@ static OFDictionary<OFString *, id> *handle_dictionary(lua_State *lua)
     return dictionary;
 }
 
-static id table_to_objc(lua_State *lua)
+static id tableToObjC(lua_State *lua)
 {
     if (lua_istable(lua, -1)) {
         if (lua_rawlen(lua, -1) > 0)
-            return handle_array(lua);
+            return handleArray(lua);
         else
-            return handle_dictionary(lua);
+            return handleDictionary(lua);
     } else {
         @throw [OFInvalidArgumentException exception];
     }
 }
 
-OFDictionary<OFString *, id> *parse_arguments(lua_State *lua, OFArray<OFString *> *arguments, OFString *progname)
+OFDictionary<OFString *, id> *parseArguments(lua_State *lua, OFArray<OFString *> *arguments, OFString *progname)
 {
     //find cli.lua next to the executable, and if not that check in the cwd
     OFFile *file;
@@ -128,7 +128,7 @@ OFDictionary<OFString *, id> *parse_arguments(lua_State *lua, OFArray<OFString *
     auto data = [OFString stringWithData: [file readDataUntilEndOfStream] encoding: OFStringEncodingUTF8];
     int i = luaL_loadbuffer(lua, data.UTF8String, data.UTF8StringLength, "cli.lua");
     if (i != LUA_OK)
-        @throw [OFLoadPluginFailedException exceptionWithPath: cliPath error: [OFString stringWithUTF8String: lua_tostring(lua, -1)]];
+        @throw [OFOpenItemFailedException exceptionWithPath: cliPath mode: @"r" errNo: i];
 
     i = lua_pcall(lua, 0, 0, 0);
     if (i != LUA_OK)
@@ -152,10 +152,10 @@ OFDictionary<OFString *, id> *parse_arguments(lua_State *lua, OFArray<OFString *
     if (!lua_istable(lua, -1))
         @throw [OFInvalidArgumentException exception];
 
-    return table_to_objc(lua);
+    return tableToObjC(lua);
 }
 
-id _Nullable execute_commands(OFDictionary<OFString *, id> *args, OFConstantString *actionKey, struct CommandInformation commands[])
+id _Nullable executeCommands(OFDictionary<OFString *, id> *args, OFConstantString *actionKey, struct CommandInformation commands[])
 {
     struct CommandInformation info;
     while ((info = *commands++, info.name != NULL)) {

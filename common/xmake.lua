@@ -1,8 +1,5 @@
-includes("../packages.lua")
-
 --Config:
 local packages = {
-    "objfw-local",
 }
 
 local sanitizers = { }

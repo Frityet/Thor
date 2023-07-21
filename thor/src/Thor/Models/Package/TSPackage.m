@@ -13,7 +13,6 @@
     self->_name = $assert_nonnil($json_field(json, @"name", OFString));
     self->_fullName = $assert_nonnil($json_field(json, @"full_name", OFString));
     self->_owner = $assert_nonnil($json_field(json, @"owner", OFString));
-    // self->_packageURL = $assert_nonnil($json_field(json, @"package_url", OFIRI));
     self->_packageURL = [OFIRI IRIWithString: $assert_nonnil($json_field(json, @"package_url", OFString))];
 
     //Remove all digits past the last `.` and Z
