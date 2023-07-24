@@ -11,7 +11,7 @@
         return nil;
 
     self->_name = $assert_nonnil($json_field(json, @"name", OFString));
-    self->_versionNumber = VersionFromString($assert_nonnil($json_field(json, @"version_number", OFString)));
+    self->_version = VersionFromString($assert_nonnil($json_field(json, @"version_number", OFString)));
     self->_fullName = $assert_nonnil($json_field(json, @"full_name", OFString));
 
     self->_packageDescription = $assert_nonnil($json_field(json, @"description", OFString));
@@ -61,7 +61,7 @@
     [str appendWithIndentationLevel: level format: @"Full Name: %@\n", self.fullName];
     [str appendWithIndentationLevel: level format: @"Description: %@\n", self.packageDescription];
     [str appendWithIndentationLevel: level format: @"Icon: %@\n", self.icon];
-    [str appendWithIndentationLevel: level format: @"Version: %@\n", VersionToString(self.versionNumber)];
+    [str appendWithIndentationLevel: level format: @"Version: %@\n", VersionToString(self.version)];
     [str appendWithIndentationLevel: level format: @"Dependencies:\n"];
     for (OFString *dep in self.dependencies)
         [str appendWithIndentationLevel: level + 2 format: @"- %@\n", dep];

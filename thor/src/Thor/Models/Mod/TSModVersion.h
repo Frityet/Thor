@@ -8,7 +8,7 @@ OF_ASSUME_NONNULL_BEGIN
 @property(atomic, readonly) OFString *fullName;
 @property(atomic, readonly) OFString *packageDescription;
 @property(atomic, readonly) OFIRI *icon;
-@property(atomic, readonly) Version versionNumber;
+@property(atomic, readonly) Version version;
 @property(atomic, readonly) OFArray<OFString *> *dependencies;
 @property(atomic, readonly) OFIRI *downloadURL;
 @property(atomic, readonly) unsigned int downloads;

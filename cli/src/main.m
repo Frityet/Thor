@@ -12,7 +12,7 @@
 
 @implementation ThorCLI
 
-- (id)listWithArguments: (OFDictionary<OFString *, id> *)args
+- (OFNumber *)listWithArguments: (OFDictionary<OFString *, id> *)args
 {
     OFArray<OFString *> *names = args[@"name"] ?: @[];
 
@@ -75,7 +75,7 @@
     return @(0);
 }
 
-- (id)infoWithArguments: (OFDictionary<OFString *, id> *)args
+- (OFNumber *)infoWithArguments: (OFDictionary<OFString *, id> *)args
 {
     auto search = $assert_type(args[@"mod"], OFString).lowercaseString;
     auto community = [Thor communityWithSlug: $assert_type(args[@"community"], OFString)];
@@ -107,7 +107,7 @@
     return @(0);
 }
 
-- (id)updateWithArguments: (OFDictionary<OFString *, id> *)args
+- (OFNumber *)updateWithArguments: (OFDictionary<OFString *, id> *)args
 {
     OFString *scope = args[@"scope"];
     bool fetchMods = args[@"fetch_mods"] != nil;
@@ -134,10 +134,15 @@
     return @(0);
 }
 
-- (id)profileWithArguments: (OFDictionary<OFString *, id> *)args
+- (OFNumber *)profileWithArguments: (OFDictionary<OFString *, id> *)args
 {
     [OFStdOut writeLine: @"Getting profile..."];
     [OFStdOut writeFormat: @"%@\n", args];
+
+    OFNumber *code = executeCommands(args, @"profile-action", (struct CommandInformation []) {
+        {0}
+    });
+
     return @(0);
 }
 
@@ -146,19 +151,20 @@
     auto lua = luaL_newstate();
     luaL_openlibs(lua);
     auto arguments = parseArguments(lua, $assert_nonnil(OFApplication.arguments), $assert_nonnil(OFApplication.programName));
-
-    #define $cmd(x) { .name = @#x, .selector = @selector(x##WithArguments:), .object = self }
-    OFNumber *code = executeCommands(arguments, @"action", (struct CommandInformation []) {
-        $cmd(list),
-        $cmd(info),
-        $cmd(update),
-        $cmd(profile),
-        {0}
-    });
-    #undef $cmd
-
     lua_close(lua);
-    [OFApplication terminateWithStatus: code.unsignedIntValue];
+
+    //must run on next runloop iteration
+    [OFTimer scheduledTimerWithTimeInterval: 0 repeats: false block: ^(OFTimer *timer) {
+        OFNumber *code = executeCommands(arguments, @"action", (struct CommandInformation []) {
+            { .name = @"list", .selector = @selector(listWithArguments:), .object = self },
+            { .name = @"info", .selector = @selector(infoWithArguments:), .object = self },
+            { .name = @"update", .selector = @selector(updateWithArguments:), .object = self },
+            { .name = @"profile", .selector = @selector(profileWithArguments:), .object = self },
+            {0}
+        });
+        // [OFApplication terminateWithStatus: code.unsignedIntValue];
+    }];
+
 }
 
 @end

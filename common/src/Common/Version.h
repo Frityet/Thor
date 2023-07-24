@@ -9,7 +9,7 @@ typedef struct Version {
 
 
 __attribute__((used))
-static Version VersionFromString(OFString *_Nonnull str)
+static inline Version VersionFromString(OFString *_Nonnull str)
 {
     OFArray<OFString *> *components = [str componentsSeparatedByString: @"."];
 
@@ -21,7 +21,11 @@ static Version VersionFromString(OFString *_Nonnull str)
 }
 
 __attribute__((used))
-static OFString *_Nonnull VersionToString(Version version)
+static inline OFString *_Nonnull VersionToString(Version version)
 {
     return [OFString stringWithFormat: @"%u.%u.%u", version.major, version.minor, version.patch];
 }
+
+__attribute__((used))
+static inline bool VersionEquals(Version a, Version b)
+{ return a.major == b.major && a.minor == b.minor && a.patch == b.patch; }

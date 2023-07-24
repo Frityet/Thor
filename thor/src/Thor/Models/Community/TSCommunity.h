@@ -5,19 +5,16 @@
 
 #import "TSCommunityCategory.h"
 
-/*
-  "results": [
-    {
-      "identifier": "shadows-of-doubt",
-      "name": "Shadows of Doubt",
-      "discord_url": "https://discord.gg/zGuvtBSeSp",
-      "wiki_url": null,
-      "require_package_listing_approval": false
-    },
-    ...
-*/
-
 OF_ASSUME_NONNULL_BEGIN
+
+@interface TSCommunityNotFoundException : OFException
+
+@property(readonly) OFString *community;
+
++ (instancetype)exceptionWithCommunity: (OFString *)community;
+- (instancetype)initWithCommunity: (OFString *)community;
+
+@end
 
 @interface TSCommunity : OFObject<ITSModel>
 
@@ -33,7 +30,7 @@ OF_ASSUME_NONNULL_BEGIN
 + (instancetype)communityFromIdentifier: (OFString *)identifier;
 - (instancetype)initFromIdentifier: (OFString *)identifier;
 
-- (TSMod *) modWithAuthor: (OFString *)ns name: (OFString *)name;
+- (TSMod *)modWithAuthor: (OFString *)ns name: (OFString *)name;
 
 @end
 

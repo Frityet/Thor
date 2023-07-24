@@ -1,5 +1,50 @@
 #include "TSMod.h"
 
+@implementation TSModNotFoundException
+
++ (instancetype)exceptionWithModName:(OFString *)modName ownedBy: (OFString *)owner inCommunity: (OFString *)community
+{ return [[self alloc] initWithModName: modName ownedBy: owner inCommunity: community]; }
+
+- (instancetype)initWithModName:(OFString *)modName ownedBy: (OFString *)owner inCommunity: (OFString *)community
+{
+    if ((self = [super init]) == nil)
+        return nil;
+
+    self->_name = modName;
+    self->_owner = owner;
+    self->_community = community;
+
+    return self;
+}
+
+- (OFString *)description
+{ return [OFString stringWithFormat: @"Mod not found: %@-%@ in community: %@", self.name, self.owner, self.community]; }
+
+@end
+
+@implementation TSModVersionNotFoundException
+
++ (instancetype)exceptionWithModName:(OFString *)modName ownedBy: (OFString *)owner version: (Version)version inCommunity: (OFString *)community
+{ return [[self alloc] initWithModName: modName ownedBy: owner version: version inCommunity: community]; }
+
+- (instancetype)initWithModName:(OFString *)modName ownedBy: (OFString *)owner version: (Version)version inCommunity: (OFString *)community
+{
+    if ((self = [super init]) == nil)
+        return nil;
+
+    self->_name = modName;
+    self->_owner = owner;
+    self->_version = version;
+    self->_community = community;
+
+    return self;
+}
+
+- (OFString *)description
+{ return [OFString stringWithFormat: @"Mod not found: %@-%@ v%@ in community: %@", self.name, self.owner, VersionToString(self.version), self.community]; }
+
+@end
+
 @implementation TSMod {
     OFMutableArray<TSModVersion *> *_versions;
 }

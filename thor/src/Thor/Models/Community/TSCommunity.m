@@ -1,6 +1,27 @@
 #include "TSCommunity.h"
 #include "Thor/Cache/TSCache.h"
 
+@implementation TSCommunityNotFoundException
+
++ (instancetype)exceptionWithCommunity:(OFString *)community
+{ return [[self alloc] initWithCommunity: community]; }
+
+- (instancetype)initWithCommunity:(OFString *)community
+{
+    if ((self = [super init]) == nil)
+        return nil;
+
+    self->_community = community;
+
+    return self;
+}
+
+- (OFString *)description
+{
+    return [OFString stringWithFormat: @"Could not find community with identifier \"%@\".", self.community];
+}
+
+@end
 
 @implementation TSCommunity {
     OFMutableArray<TSCommunityCategory *> *_categories;

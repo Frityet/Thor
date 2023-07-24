@@ -4,6 +4,28 @@
 
 OF_ASSUME_NONNULL_BEGIN
 
+@interface TSModNotFoundException : OFException {
+    @protected OFString *_name;
+    @protected OFString *_owner;
+    @protected OFString *_community;
+}
+
+@property(readonly) OFString *name;
+@property(readonly) OFString *owner;
+@property(readonly) OFString *community;
+
++ (instancetype)exceptionWithModName:(OFString *)modName ownedBy: (OFString *)owner inCommunity: (OFString *)community;
+
+@end
+
+@interface TSModVersionNotFoundException : TSModNotFoundException
+
+@property(readonly) Version version;
+
++ (instancetype)exceptionWithModName:(OFString *)modName ownedBy: (OFString *)owner version: (Version)version inCommunity: (OFString *)community;
+
+@end
+
 @interface TSMod : OFObject<ITSModel>
 
 @property(atomic, readonly) OFString *name;

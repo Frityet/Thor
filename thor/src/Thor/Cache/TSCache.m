@@ -72,8 +72,8 @@
 - (OFFile *)createFileNamed: (OFString *)name withContents: (OFString *)contents
 {
     auto file = [self createFileNamed: name];
-    [file writeString: contents];
-    [file seekToOffset: 0 whence: OFSeekEnd];
+    [file asyncWriteString: contents];
+    [file seekToOffset: 0 whence: OFSeekSet];
     return file;
 }
 
@@ -98,7 +98,7 @@
 - (OFFile *)objectForKeyedSubscript: (OFString *)key
 {
     auto f = self->_cache[key];
-    [f seekToOffset: 0 whence: OFSeekEnd];
+    [f seekToOffset: 0 whence: OFSeekSet];
     return f;
 }
 
@@ -110,7 +110,7 @@
     }
 
     auto file = [self createFileNamed: key];
-    [file writeString: str];
+    [file asyncWriteString: str];
 }
 
 @end
