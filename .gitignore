@@ -2,5 +2,5 @@ compile_commands.json
 .cache/
 .xmake/
 build/
-
-cli/src/cache
+*.luac
+cache/

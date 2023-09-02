@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <iso646.h>
 #include "ObjFW.h"
 
 typedef struct Version {
@@ -28,4 +29,4 @@ static inline OFString *_Nonnull VersionToString(Version version)
 
 __attribute__((used))
 static inline bool VersionEquals(Version a, Version b)
-{ return a.major == b.major && a.minor == b.minor && a.patch == b.patch; }
+{ return a.major == b.major and a.minor == b.minor and a.patch == b.patch; }

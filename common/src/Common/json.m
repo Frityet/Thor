@@ -10,9 +10,9 @@
 {
     self = [super init];
     if (self == nil)
-        return nil;
 
-    _key = [key copy];
+
+    _key = key;
 
     return self;
 }
@@ -33,9 +33,9 @@
 {
     self = [super init];
     if (self == nil)
-        return nil;
 
-    _key = [key copy];
+
+    _key = key;
     _expectedType = expectedType;
     _realType = realType;
 
@@ -54,7 +54,7 @@ id _Nullable getJSONField(OFDictionary *json, OFString *key, Class type)
         @throw [JSONKeyNotFoundException exceptionWithKey: key];
 
     if (value == OFNull.null)
-        return nil;
+
 
     if (![value isKindOfClass:type])
         @throw [JSONTypeMismatchException exceptionWithKey: key expectedType: type realType: [value class]];

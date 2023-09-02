@@ -13,7 +13,7 @@
         [OFStdOut writeLine: @"Downloading and caching communities..."];
         file = [TSCache.sharedCache createFileNamed: @"communities"];
         auto resp = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: $assert_nonnil(TSCommunity.url)]];
-        [file asyncWriteString: resp];
+        [file writeString: resp];
         json = resp.objectByParsingJSON;
     } else {
         auto data = [OFString stringWithData: $assert_nonnil([file readDataUntilEndOfStream]) encoding: OFStringEncodingUTF8];

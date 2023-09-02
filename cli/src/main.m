@@ -8,19 +8,20 @@
 
 #include "ArgumentParsing.h"
 
+
 @interface ThorCLI : OFObject<OFApplicationDelegate> @end
 
 @implementation ThorCLI
 
 - (OFNumber *)listWithArguments: (OFDictionary<OFString *, id> *)args
 {
-    OFArray<OFString *> *names = args[@"name"] ?: @[];
+    OFArray<OFString *> *names      = args[@"name"] ?: @[];
 
-    OFArray<OFString *> *cats = args[@"category"] ?: @[],
-                        *xcats = args[@"exclude_category"] ?: @[];
+    OFArray<OFString *> *cats       = args[@"category"] ?: @[],
+                        *xcats      = args[@"exclude_category"] ?: @[];
 
-    OFArray<OFString *> *authors = args[@"author"] ?: @[],
-                        *xauthors = args[@"exclude_author"] ?: @[];
+    OFArray<OFString *> *authors    = args[@"author"] ?: @[],
+                        *xauthors   = args[@"exclude_author"] ?: @[];
 
     auto community = [Thor communityWithSlug: $assert_type(args[@"community"], OFString)];
     if (community == nil) {
@@ -29,9 +30,9 @@
     }
 
     if ([args[@"scope"] isEqual: @"categories"]) {
-        for (TSCommunityCategory *category in community.categories) {
+        for (TSCommunityCategory *category in community.categories)
             [OFStdOut writeFormat: @"- \"%@\" (%@)\n", category.name, category.slug];
-        }
+
     } else if ([args[@"scope"] isEqual: @"mods"]) {
         auto mods = community.mods;
 
@@ -68,7 +69,8 @@
 
             [OFStdOut writeFormat: @"  - %@\n", mod.fullName];
 
-            next:
+        next:
+            continue;
         }
     }
 
@@ -77,7 +79,7 @@
 
 - (OFNumber *)infoWithArguments: (OFDictionary<OFString *, id> *)args
 {
-    auto search = $assert_type(args[@"mod"], OFString).lowercaseString;
+    auto search = [$assert_type(args[@"mod"], OFString) lowercaseString];
     auto community = [Thor communityWithSlug: $assert_type(args[@"community"], OFString)];
 
     bool showVersions = args[@"versions"] != nil;
@@ -89,8 +91,8 @@
 
     auto choices = [OFMutableArray<TSMod *> array];
     for (TSMod *mod in community.mods) {
-        auto pkgid = mod.fullName.lowercaseString;
-        if ([pkgid containsString: search] || [pkgid isEqual: search])
+        auto pkgid = [mod.fullName lowercaseString];
+        if ([pkgid containsString: search] or [pkgid isEqual: search])
             [choices addObject: mod];
     }
 
@@ -153,18 +155,14 @@
     auto arguments = parseArguments(lua, $assert_nonnil(OFApplication.arguments), $assert_nonnil(OFApplication.programName));
     lua_close(lua);
 
-    //must run on next runloop iteration
-    [OFTimer scheduledTimerWithTimeInterval: 0 repeats: false block: ^(OFTimer *timer) {
-        OFNumber *code = executeCommands(arguments, @"action", (struct CommandInformation []) {
-            { .name = @"list", .selector = @selector(listWithArguments:), .object = self },
-            { .name = @"info", .selector = @selector(infoWithArguments:), .object = self },
-            { .name = @"update", .selector = @selector(updateWithArguments:), .object = self },
-            { .name = @"profile", .selector = @selector(profileWithArguments:), .object = self },
-            {0}
-        });
-        // [OFApplication terminateWithStatus: code.unsignedIntValue];
-    }];
-
+    OFNumber *code = executeCommands(arguments, @"action", (struct CommandInformation []) {
+        { .name = @"list", .selector = @selector(listWithArguments:), .object = self },
+        { .name = @"info", .selector = @selector(infoWithArguments:), .object = self },
+        { .name = @"update", .selector = @selector(updateWithArguments:), .object = self },
+        { .name = @"profile", .selector = @selector(profileWithArguments:), .object = self },
+        {0}
+    });
+    [OFApplication terminateWithStatus: code.unsignedIntValue];
 }
 
 @end

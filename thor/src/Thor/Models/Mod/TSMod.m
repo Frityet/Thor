@@ -7,8 +7,8 @@
 
 - (instancetype)initWithModName:(OFString *)modName ownedBy: (OFString *)owner inCommunity: (OFString *)community
 {
-    if ((self = [super init]) == nil)
-        return nil;
+    self = [super init];
+
 
     self->_name = modName;
     self->_owner = owner;
@@ -29,8 +29,8 @@
 
 - (instancetype)initWithModName:(OFString *)modName ownedBy: (OFString *)owner version: (Version)version inCommunity: (OFString *)community
 {
-    if ((self = [super init]) == nil)
-        return nil;
+    self = [super init];
+
 
     self->_name = modName;
     self->_owner = owner;
@@ -54,8 +54,8 @@
 
 - (instancetype)initWithJSON:(OFDictionary *)json
 {
-    if ((self = [super init]) == nil)
-        return nil;
+    self = [super init];
+
 
     self->_name = $assert_nonnil($json_field(json, @"name", OFString));
     self->_fullName = $assert_nonnil($json_field(json, @"full_name", OFString));

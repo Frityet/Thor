@@ -7,8 +7,8 @@
 
 - (instancetype)initWithJSON:(OFDictionary *)json
 {
-    if ((self = [super init]) == nil)
-        return nil;
+    self = [super init];
+
 
     self->_name = $assert_nonnil($json_field(json, @"name", OFString));
     self->_version = VersionFromString($assert_nonnil($json_field(json, @"version_number", OFString)));

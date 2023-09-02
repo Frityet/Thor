@@ -47,12 +47,13 @@ add_requires(packages, { debug = is_mode("debug"), configs = { shared = is_kind(
 target("ThorCLI")
 do
     set_kind("binary")
+    add_rules("utils.bin2c", { extensions = { ".luac" } })
     add_packages(packages)
 
     add_deps("Thor", "Common")
 
     add_files("src/**.m")
-    add_files("src/**.mm")
+    add_files("src/cli.luac")
     add_headerfiles("src/**.h")
 
     add_includedirs("src/")
@@ -75,12 +76,8 @@ do
         add_ldflags(ldflags.release)
     end
 
-    after_build(function (target)
-        os.cp("$(projectdir)/src/*.lua", target:targetdir())
-    end)
-
-    after_install(function (target)
-        os.cp("$(projectdir)/src/*.lua", target:installdir())
+    before_build(function (target)
+        os.runv("luac", { "-s", "-o", path.join(target:scriptdir(), "src", "cli.luac"), path.join(target:scriptdir(), "src", "cli.lua") })
     end)
 end
 target_end()

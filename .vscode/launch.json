@@ -43,18 +43,6 @@
             "args": [
                 "update", "database", "-f"
             ],
-            "cwd": "${workspaceFolder}/cli/src",
-            "preLaunchTask": "Build",
-            "console": "internalConsole"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Async Test",
-            "program": "${workspaceFolder}/build/macosx/x86_64/debug/async-test",
-            "args": [
-
-            ],
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build",
             "console": "internalConsole"

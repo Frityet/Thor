@@ -4,15 +4,20 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
+static const uint8_t LUA_CODE[] = {
+#   include "cli.luac.h"
+};
+
+
+
 @implementation LuaExecutionException
 
 - (instancetype)initWithStatus: (int)status message: (OFString *)message
 {
-    if ((self = [super init]) == nil)
-        return nil;
+    self = [super init];
 
     self->_status = status;
-    self->_message = [message copy];
+    self->_message = message;
 
     return self;
 }
@@ -78,6 +83,7 @@ static OFDictionary<OFString *, id> *handleDictionary(lua_State *lua)
             default:
                 @throw [OFInvalidArgumentException exception];
         }
+
         id value = nil;
         switch (lua_type(lua, -1)) {
             case LUA_TBOOLEAN:
@@ -104,10 +110,8 @@ static OFDictionary<OFString *, id> *handleDictionary(lua_State *lua)
 static id tableToObjC(lua_State *lua)
 {
     if (lua_istable(lua, -1)) {
-        if (lua_rawlen(lua, -1) > 0)
-            return handleArray(lua);
-        else
-            return handleDictionary(lua);
+        if (lua_rawlen(lua, -1) > 0) return handleArray(lua);
+        else return handleDictionary(lua);
     } else {
         @throw [OFInvalidArgumentException exception];
     }
@@ -115,20 +119,9 @@ static id tableToObjC(lua_State *lua)
 
 OFDictionary<OFString *, id> *parseArguments(lua_State *lua, OFArray<OFString *> *arguments, OFString *progname)
 {
-    //find cli.lua next to the executable, and if not that check in the cwd
-    OFFile *file;
-    auto cliPath = $assert_nonnil([[OFApplication.programName stringByDeletingLastPathComponent] stringByAppendingPathComponent: @"cli.lua"]);
-    if ([OFFileManager.defaultManager fileExistsAtPath: cliPath])
-        file = [OFFile fileWithPath: cliPath mode: @"r"];
-    else {
-        cliPath = $assert_nonnil([[OFFileManager.defaultManager currentDirectoryPath] stringByAppendingPathComponent: @"cli.lua"]);
-
-        file = [OFFile fileWithPath: cliPath mode: @"r"];
-    }
-    auto data = [OFString stringWithData: [file readDataUntilEndOfStream] encoding: OFStringEncodingUTF8];
-    int i = luaL_loadbuffer(lua, data.UTF8String, data.UTF8StringLength, "cli.lua");
+    int i = luaL_loadbuffer(lua, (const char *)LUA_CODE, sizeof(LUA_CODE), "cli.lua");
     if (i != LUA_OK)
-        @throw [OFOpenItemFailedException exceptionWithPath: cliPath mode: @"r" errNo: i];
+        @throw [LuaExecutionException exceptionWithStatus: i message: [OFString stringWithUTF8String: lua_tostring(lua, -1)]];
 
     i = lua_pcall(lua, 0, 0, 0);
     if (i != LUA_OK)
@@ -139,7 +132,7 @@ OFDictionary<OFString *, id> *parseArguments(lua_State *lua, OFArray<OFString *>
 
     lua_newtable(lua);
     for (OFString *argument in arguments) {
-        lua_pushstring(lua, argument.UTF8String);
+        lua_pushlstring(lua, argument.UTF8String, argument.UTF8StringLength);
         lua_rawseti(lua, -2, lua_rawlen(lua, -2) + 1);
     }
 

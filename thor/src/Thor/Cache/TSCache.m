@@ -8,8 +8,8 @@
 
 - (instancetype)initWithIRI: (OFIRI *)iri
 {
-    if ((self = [super init]) == nil)
-        return nil;
+    self = [super init];
+
 
     self->_iri = iri;
 
@@ -36,8 +36,8 @@
 
 - (instancetype)initWithDirectory: (OFIRI *)directory
 {
-    if ((self = [super init]) == nil)
-        return nil;
+    self = [super init];
+
 
     self->_directory = directory;
     self->_cache = [[OFMutableDictionary alloc] init];
@@ -72,7 +72,7 @@
 - (OFFile *)createFileNamed: (OFString *)name withContents: (OFString *)contents
 {
     auto file = [self createFileNamed: name];
-    [file asyncWriteString: contents];
+    [file writeString: contents];
     [file seekToOffset: 0 whence: OFSeekSet];
     return file;
 }
@@ -110,7 +110,7 @@
     }
 
     auto file = [self createFileNamed: key];
-    [file asyncWriteString: str];
+    [file writeString: str];
 }
 
 @end

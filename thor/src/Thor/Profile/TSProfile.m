@@ -18,8 +18,8 @@
 
 - (instancetype)initWithFile: (OFFile *)file
 {
-    if ((self = [super init]) == nil)
-        return nil;
+    self = [super init];
+
 
     self->_file = file;
 
@@ -77,8 +77,8 @@
 
 - (instancetype)initProfileWithName:(OFString *)name game:(OFString *)game path:(OFString *)path mods:(OFArray<TSModVersion *> *)mods
 {
-    if ((self = [super init]) == nil)
-        return nil;
+    self = [super init];
+
 
     self->_name = name;
     self->_game = game;
@@ -103,7 +103,7 @@
 {
     TSMod *selectedMod = nil;
     for (TSMod *mod in self->_community.mods) {
-        if ([mod.owner isEqual: owner] && [mod.name isEqual: name])
+        if ([mod.owner isEqual: owner] and [mod.name isEqual: name])
             selectedMod = mod;
     }
     if (selectedMod == nil) {
@@ -128,8 +128,8 @@
     for (TSModVersion *mod in self->_mods) {
         bool nameEquals = [mod.name isEqual: name];
         bool versionEquals = VersionEquals(mod.version, version);
-        if (nameEquals && versionEquals) return;
-        else if (nameEquals && !versionEquals) {
+        if (nameEquals and versionEquals) return;
+        else if (nameEquals and !versionEquals) {
             [self->_mods removeObject: mod];
             break;
         }

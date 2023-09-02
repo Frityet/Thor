@@ -30,4 +30,4 @@ add_requires(has_config("use-system-objfw") and "objfw" or "objfw-local", {
 
 add_packages("ofw")
 
-includes("cli", "async-test", "thor", "common")
+includes("cli", "thor", "common")

@@ -45,7 +45,7 @@ do
 
     add_files("src/**.m")
     add_headerfiles("src/**.h")
-    set_pmheader("src/Common/common.h")
+    -- set_pmheader("src/Common/common.h")
 
     add_includedirs("src/", { public = true })
 

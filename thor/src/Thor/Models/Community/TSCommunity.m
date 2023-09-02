@@ -8,8 +8,8 @@
 
 - (instancetype)initWithCommunity:(OFString *)community
 {
-    if ((self = [super init]) == nil)
-        return nil;
+    self = [super init];
+
 
     self->_community = community;
 
@@ -36,8 +36,8 @@
 
 - (instancetype)initWithJSON:(OFDictionary *)json
 {
-    if ((self = [super init]) == nil)
-        return nil;
+    self = [super init];
+
 
     self->_identifier = $assert_nonnil($json_field(json, @"identifier", OFString));
     self->_name = $assert_nonnil($json_field(json, @"name", OFString));
