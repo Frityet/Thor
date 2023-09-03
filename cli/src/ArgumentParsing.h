@@ -7,10 +7,11 @@ OF_ASSUME_NONNULL_BEGIN
 @interface LuaExecutionException : OFException
 
 @property (readonly) int status;
-@property (readonly) OFString *message;
+@property (readonly) OFString *error;
+@property (readonly) size_t position;
 
-- (instancetype)initWithStatus: (int)status message: (OFString *)message;
-+ (instancetype)exceptionWithStatus: (int)status message: (OFString *)message;
+- (instancetype)initWithStatus: (int)status lua: (lua_State *)lua;
++ (instancetype)exceptionWithStatus: (int)status lua: (lua_State *)lua;
 
 @end
 

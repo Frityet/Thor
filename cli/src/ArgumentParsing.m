@@ -4,32 +4,39 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
+#include "ObjFW/OFString.h"
+#import "utilities.h"
+
 static const uint8_t LUA_CODE[] = {
 #   include "cli.luac.h"
 };
 
-
-
 @implementation LuaExecutionException
 
-- (instancetype)initWithStatus: (int)status message: (OFString *)message
+- (instancetype)initWithStatus: (int)status lua: (lua_State *)lua
 {
     self = [super init];
 
     self->_status = status;
-    self->_message = message;
+
+    lua_Debug ar = {0};
+    lua_getstack(lua, 1, &ar);
+    lua_getinfo(lua, "nSl", &ar);
+    self->_position = ar.currentline;
+
+    self->_error = [OFString stringWithCString: lua_tostring(lua, -1) encoding: OFStringEncodingUTF8];
 
     return self;
 }
 
-+ (instancetype)exceptionWithStatus: (int)status message: (OFString *)message
++ (instancetype)exceptionWithStatus: (int)status lua: (lua_State *)lua
 {
-    return [[self alloc] initWithStatus: status message: message];
+    return [[self alloc] initWithStatus: status lua: lua];
 }
 
 - (OFString *)description
 {
-    return [OFString stringWithFormat: @"Lua execution failed with status %d: %@", _status, _message];
+    return [OFString stringWithFormat: @"Lua execution failed with status %d: %@ (line %zu)", self.status, self.error, self.position];
 }
 
 @end
@@ -121,13 +128,13 @@ OFDictionary<OFString *, id> *parseArguments(lua_State *lua, OFArray<OFString *>
 {
     int i = luaL_loadbuffer(lua, (const char *)LUA_CODE, sizeof(LUA_CODE), "cli.lua");
     if (i != LUA_OK)
-        @throw [LuaExecutionException exceptionWithStatus: i message: [OFString stringWithUTF8String: lua_tostring(lua, -1)]];
+        @throw [LuaExecutionException exceptionWithStatus: i lua: lua];
 
     i = lua_pcall(lua, 0, 0, 0);
     if (i != LUA_OK)
-        @throw [LuaExecutionException exceptionWithStatus: i message: [OFString stringWithUTF8String: lua_tostring(lua, -1)]];
+        @throw [LuaExecutionException exceptionWithStatus: i lua: lua];
 
-    //function ParseArgumants(arguments: string[], program_name: string): { [string]: any }
+    //function ParseArgumants(arguments: string[], program_name: string, home_dir: string): { [string]: any }
     lua_getglobal(lua, "ParseArguments");
 
     lua_newtable(lua);
@@ -138,9 +145,12 @@ OFDictionary<OFString *, id> *parseArguments(lua_State *lua, OFArray<OFString *>
 
     lua_pushlstring(lua, progname.UTF8String, progname.UTF8StringLength);
 
-    i = lua_pcall(lua, 2, 1, 0);
+    OFIRI *homeDir = GetHomeDirectory();
+    lua_pushlstring(lua, homeDir.string.UTF8String, homeDir.string.UTF8StringLength);
+
+    i = lua_pcall(lua, 3, 1, 0);
     if (i != LUA_OK)
-        @throw [LuaExecutionException exceptionWithStatus: i message: [OFString stringWithUTF8String: lua_tostring(lua, -1)]];
+        @throw [LuaExecutionException exceptionWithStatus: i lua: lua];
 
     if (!lua_istable(lua, -1))
         @throw [OFInvalidArgumentException exception];

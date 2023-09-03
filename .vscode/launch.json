@@ -38,6 +38,18 @@
         {
             "type": "lldb",
             "request": "launch",
+            "name": "Profile list",
+            "program": "${workspaceFolder}/build/macosx/x86_64/debug/thorcli",
+            "args": [
+                "profile", "--list"
+            ],
+            "cwd": "${workspaceFolder}/cli/src",
+            "preLaunchTask": "Build",
+            "console": "internalConsole"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
             "name": "Update",
             "program": "${workspaceFolder}/build/macosx/x86_64/debug/thorcli",
             "args": [

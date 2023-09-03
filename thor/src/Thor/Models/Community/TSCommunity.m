@@ -1,5 +1,8 @@
 #include "TSCommunity.h"
-#include "Thor/Cache/TSCache.h"
+#import "Thor/Cache/TSCache.h"
+
+#import "Common/Promise.h"
+#import "Common/AsyncHTTP.h"
 
 @implementation TSCommunityNotFoundException
 
@@ -38,12 +41,12 @@
 {
     self = [super init];
 
-
     self->_identifier = $assert_nonnil($json_field(json, @"identifier", OFString));
     self->_name = $assert_nonnil($json_field(json, @"name", OFString));
     self->_discordURL = $json_field(json, @"discord_url", OFString);
     self->_wikiURL = $json_field(json, @"wiki_url", OFString);
     self->_requirePackageListingApproval = $json_field(json, @"require_package_listing_approval", OFNumber).boolValue;
+
     return self;
 }
 
@@ -51,13 +54,29 @@
 { return [[self alloc] initFromIdentifier: identifier]; }
 
 - (instancetype)initFromIdentifier:(OFString *)identifier
-{ return [self initWithJSON: (OFDictionary *)[OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [TSCommunity urlWithParametres: @{ @"community": identifier }]]].objectByParsingJSON]; }
+{
+    OFString *contents;
+    @try {
+        contents = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [TSCommunity urlWithParametres: @{ @"community": identifier }]]];
+    } @catch(OFException *) {
+        contents = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [TSCommunity urlWithParametres: @{ @"community": identifier, @"new": @"" }]]];
+    }
+
+    return [self initWithJSON: (OFDictionary *)contents.objectByParsingJSON];
+}
 
 + (OFString *)url
 { return @"https://thunderstore.io/api/experimental/community/"; }
 
 + (OFString *)urlWithParametres:(OFDictionary<OFString *,OFString *> *)params
-{ return [OFString stringWithFormat: @"https://%@.thunderstore.io/api/experimental/current-community/", params[@"community"]]; }
+{
+    auto newFmt = params[@"new"] != nil;
+
+    if (newFmt)
+        return [OFString stringWithFormat: @"https://thunderstore.io/c/%@/api/experimental/current-community/", params[@"community"]];
+    else
+        return [OFString stringWithFormat: @"https://%@.thunderstore.io/api/experimental/current-community/", params[@"community"]];
+}
 
 - (OFArray<TSCommunityCategory *> *)categories
 {
@@ -117,16 +136,32 @@
             auto url = [OFIRI IRIWithString: [TSMod urlWithParametres: @{ @"community": self.identifier }]];
             [OFStdOut writeFormat: @"Fetching %@ from %@...\n", fname, url.string];
 
-            auto resp = [OFString stringWithContentsOfIRI: url];
-            file = [TSCache.sharedCache createFileNamed: fname];
-            [file writeString: resp];
-
             #if PROJECT_DEBUG
             [OFStdOut writeFormat: @"Reading %@ from cache...\n", fname];
             auto date = [OFDate date];
             #endif
 
-            auto json = $assert_type(resp.objectByParsingJSON, OFArray<OFDictionary *>);
+            OFString *resp;
+            OFArray<OFDictionary *> *json;
+            @try {
+                resp = [OFString stringWithContentsOfIRI: url];
+                #if PROJECT_DEBUG
+                [OFStdOut writeFormat: @"Downloaded %@ in %f seconds.\n", fname, date.timeIntervalSinceNow * -1];
+                #endif
+                json = $assert_type(resp.objectByParsingJSON, OFArray<OFDictionary *>);
+            } @catch(OFException *) {
+                url = [OFIRI IRIWithString: [TSMod urlWithParametres: @{ @"community": self.identifier, @"new": @"" }]];
+                [OFStdOut writeFormat: @"Failed to fetch! Trying with new URL %@...\n", url.string];
+                resp = [OFString stringWithContentsOfIRI: url];
+                #if PROJECT_DEBUG
+                [OFStdOut writeFormat: @"Downloaded %@ in %f seconds.\n", fname, date.timeIntervalSinceNow * -1];
+                #endif
+                json = $assert_type(resp.objectByParsingJSON, OFArray<OFDictionary *>);
+            }
+
+            file = [TSCache.sharedCache createFileNamed: fname];
+            [file writeString: resp];
+
             self->_mods = [OFMutableArray<TSMod *> arrayWithCapacity: json.count];
             for (OFDictionary *result in json)
                 [self->_mods addObject: [TSMod modelFromJSON: result]];
@@ -138,6 +173,84 @@
     }
 
     return self->_mods;
+}
+
+// - (void)fetchModDatabaseAsync
+// {
+//     auto url = [OFIRI IRIWithString: [TSMod urlWithParametres: @{ @"community": self.identifier }]];
+//     [OFStdOut writeFormat: @"Fetching %@ from %@...\n", @"mod database", url.string];
+
+//     auto client = [OFHTTPClient client];
+//     client.delegate = self;
+//     auto request = [OFHTTPRequest requestWithIRI: url];
+
+//     [client asyncPerformRequest: request];
+// }
+
+- (Promise<OFArray<TSMod *> *> *)fetchModsAsync
+{
+    return [Promise promiseWithBlock: ^{
+        if (self->_mods == nil) {
+            auto fname = [OFString stringWithFormat: @"%@.packages", self.identifier];
+
+            auto file = TSCache.sharedCache[fname];
+            if (file != nil) {
+                #if PROJECT_DEBUG
+                [OFStdOut writeFormat: @"Parsing %@ from cache as JSON...\n", fname];
+
+                auto date = [OFDate date];
+                #endif
+
+                auto json = (OFArray *)[OFString stringWithData: $assert_nonnil([file readDataUntilEndOfStream]) encoding: OFStringEncodingUTF8].objectByParsingJSON;
+
+                #if PROJECT_DEBUG
+                [OFStdOut writeFormat: @"\rParsed %@ (%d entries) from cache as JSON in %f seconds.\n", fname, json.count, date.timeIntervalSinceNow * -1];
+                #endif
+
+                self->_mods = [OFMutableArray<TSMod *> arrayWithCapacity: json.count];
+                for (OFDictionary *result in json)
+                    [self->_mods addObject: [TSMod modelFromJSON: result]];
+            } else {
+                auto url = [OFIRI IRIWithString: [TSMod urlWithParametres: @{ @"community": self.identifier }]];
+                [OFStdOut writeFormat: @"Fetching %@ from %@...\n", fname, url.string];
+
+                OFString *resp;
+                OFArray<OFDictionary *> *json;
+                @try {
+                    resp = [OFString stringWithContentsOfIRI: url];
+                    json = $assert_type(resp.objectByParsingJSON, OFArray<OFDictionary *>);
+                } @catch(OFException *) {
+                    url = [OFIRI IRIWithString: [TSMod urlWithParametres: @{ @"community": self.identifier, @"new": @"" }]];
+                    [OFStdOut writeFormat: @"Failed to fetch! Trying with new URL %@...\n", url.string];
+                    resp = [OFString stringWithContentsOfIRI: url];
+                    json = $assert_type(resp.objectByParsingJSON, OFArray<OFDictionary *>);
+                }
+
+                file = [TSCache.sharedCache createFileNamed: fname];
+                [file writeString: resp];
+
+                #if PROJECT_DEBUG
+                [OFStdOut writeFormat: @"Reading %@ from cache...\n", fname];
+                auto date = [OFDate date];
+                #endif
+
+                self->_mods = [OFMutableArray<TSMod *> arrayWithCapacity: json.count];
+                for (OFDictionary *result in json)
+                    [self->_mods addObject: [TSMod modelFromJSON: result]];
+
+                #if PROJECT_DEBUG
+                [OFStdOut writeFormat: @"Read %@ (%d entries) from cache in %f seconds.\n", fname, self->_mods.count, date.timeIntervalSinceNow * -1];
+                #endif
+            }
+        }
+
+        return self->_mods;
+    }];
+}
+
+- (void)client:(OFHTTPClient *)client didPerformRequest:(nonnull OFHTTPRequest *)request response:(nullable OFHTTPResponse *)response exception:(nullable id)exception
+{
+
 }
 
 - (TSMod *) modWithAuthor: (OFString *)ns name: (OFString *)name

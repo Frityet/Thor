@@ -2107,8 +2107,9 @@ end)()
 
 ---@param args string[]
 ---@param program_name string
+---@param home_dir string
 ---@return { [string]: any }
-function ParseArguments(args, program_name)
+function ParseArguments(args, program_name, home_dir)
     args[0] = program_name
     local parser = argparse(program_name, "Mod manager for thunderstore", "https://github.com/Frityet/Thor")
     parser:command_target("action")
@@ -2118,7 +2119,7 @@ function ParseArguments(args, program_name)
             local cmd = parser:command("list", "List mods")
             cmd:argument "community"
 
-            ---@diagnostic disable-next-line: param-type-mismatch
+
             cmd:argument {
                 name = "scope",
                 choices = {
@@ -2129,39 +2130,39 @@ function ParseArguments(args, program_name)
                 args = "?"
             }
 
-            ---@diagnostic disable-next-line: param-type-mismatch
+
             cmd:option {
                 name = "-v --versions",
                 description = "Show versions of mods",
                 args = 0
             }
 
-            ---@diagnostic disable-next-line: param-type-mismatch
+
             cmd:option {
                 name = "-c --category",
                 args = "+"
             }
 
-            ---@diagnostic disable-next-line: param-type-mismatch
+
             cmd:option {
                 name = "-x --exclude-category",
                 args = "+"
             }
 
 
-            ---@diagnostic disable-next-line: param-type-mismatch
+
             cmd:option {
                 name = "-n --name",
                 args = "+",
                 description = "Filter by mod name"
             }
 
-            ---@diagnostic disable-next-line: param-type-mismatch
+
             cmd:option {
                 name = "-a --author",
                 args = "+"
             }
-            ---@diagnostic disable-next-line: param-type-mismatch
+
             cmd:option {
                 name = "-z --exclude-author",
                 args = "+"
@@ -2172,7 +2173,7 @@ function ParseArguments(args, program_name)
         --#region Info
         do
             local cmd = parser:command("info", "Get info about a mod")
-            ---@diagnostic disable-next-line: param-type-mismatch
+
             cmd:argument "community"
             cmd:argument "mod"
         end
@@ -2181,7 +2182,7 @@ function ParseArguments(args, program_name)
         --#region Update
         do
             local cmd = parser:command("update", "Update the cache or mods")
-            ---@diagnostic disable-next-line: param-type-mismatch
+
             cmd:argument {
                 name = "scope",
                 choices = {
@@ -2191,14 +2192,14 @@ function ParseArguments(args, program_name)
                 default = "database"
             }
 
-            ---@diagnostic disable-next-line: param-type-mismatch
+
             cmd:option {
                 name = "-f --fetch-mods",
                 description = "Fetch mods from thunderstore",
                 args = 0
             }
 
-            ---@diagnostic disable-next-line: param-type-mismatch
+
             cmd:option {
                 name = "-c --community",
                 args = "+",
@@ -2211,52 +2212,63 @@ function ParseArguments(args, program_name)
             local cmd = parser:command("profile", "Manage profiles")
 
             cmd:command_target "profile-action"
-            ---@diagnostic disable-next-line: param-type-mismatch
+
             cmd:argument {
                 name = "profile",
                 description = "The profile to use",
             }
 
-            ---@diagnostic disable-next-line: param-type-mismatch
+            local path_sep = package.config:sub(1, 1)
+
+            local function join(...) return table.concat({...}, path_sep) end
+
             cmd:option {
                 name = "-d --directory",
-                description = "Directory the profile resides in",
+                description = "Directory the profile resides in (controlled by the env-var $THOR_PROFILE_DIR)",
+                default = os.getenv("THOR_PROFILE_DIR") or join(home_dir, ".thor", "profiles"),
                 args = 1,
             }
 
+            cmd:option {
+                name = "-l --list",
+                description = "List profiles",
+                args = 0,
+            }
+
             cmd:command("delete", "Delete a profile")
-            cmd:command("list", "List profiles")
+            cmd:command("list", "List mods in a profile")
 
             --#region Create
             do
                 local cmd = cmd:command("create", "Create a new profile")
-                ---@diagnostic disable-next-line: param-type-mismatch
+
                 cmd:argument {
                     name = "community",
                     description = "community the profile is for",
                     args = 1,
                 }
+
             end
             --#endregion
 
             --#region Add
             do
                 local cmd = cmd:command("add", "Add a mod to a profile")
-                ---@diagnostic disable-next-line: param-type-mismatch
+
                 cmd:argument {
                     name = "author",
                     description = "The mod's author",
                     args = 1,
                 }
 
-                ---@diagnostic disable-next-line: param-type-mismatch
+
                 cmd:argument {
                     name = "mod",
                     description = "The mod to add",
                     args = 1,
                 }
 
-                ---@diagnostic disable-next-line: param-type-mismatch
+
                 cmd:option {
                     name = "-v --version",
                     description = "The version to add",

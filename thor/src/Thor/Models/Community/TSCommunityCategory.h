@@ -9,6 +9,8 @@ OF_ASSUME_NONNULL_BEGIN
 @property(atomic, readonly) OFString *name;
 @property(atomic, readonly) OFString *slug;
 
+
+
 @end
 
 OF_ASSUME_NONNULL_END

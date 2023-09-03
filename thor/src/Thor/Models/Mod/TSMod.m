@@ -94,12 +94,20 @@
     auto author = params[@"author"];
     auto name = params[@"name"];
 
-    if (author == nil)
+    auto newFmt = params[@"new"] != nil;
+
+    if (author == nil) {
         //assume we want all packages, we need to use the v1 endpoint because the experiemntal one returns all packages from all communities
-        return [OFString stringWithFormat: @"https://%@.thunderstore.io/api/v1/package/", community];
+        if (newFmt)
+            return [OFString stringWithFormat: @"https://thunderstore.io/c/%@/api/v1/package/", community];
+        else
+            return [OFString stringWithFormat: @"https://%@.thunderstore.io/api/v1/package/", community];
+    }
 
-
-    return [OFString stringWithFormat: @"https://%@.thunderstore.io/api/experimental/package/%@/%@/", community, author, name];
+    if (newFmt)
+        return [OFString stringWithFormat: @"https://thunderstore.io/c/%@/api/experimental/package/%@/%@/", community, author, name];
+    else
+        return [OFString stringWithFormat: @"https://%@.thunderstore.io/api/experimental/package/%@/%@/", community, author, name];
 }
 
 - (OFString *)description

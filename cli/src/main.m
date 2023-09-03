@@ -4,10 +4,117 @@
 #include <lauxlib.h>
 #include <lualib.h>
 
+#include "ObjFW/OFApplication.h"
+#include "ObjFW/OFMutableArray.h"
 #include "Thor/Thor.h"
 
 #include "ArgumentParsing.h"
 
+static void LoadingAnimation(OFString *text)
+{
+    static const char *const SPINNERS[][64] = {
+        { "←", "↖", "↑", "↗", "→", "↘", "↓", "↙" },
+        { "▁", "▃", "▄", "▅", "▆", "▇", "█", "▇", "▆", "▅", "▄", "▃" },
+        { "▉", "▊", "▋", "▌", "▍", "▎", "▏", "▎", "▍", "▌", "▋", "▊", "▉" },
+        { "▖", "▘", "▝", "▗"},
+        { "▌", "▀", "▐", "▄" },
+        { "┤", "┘", "┴", "└", "├", "┌", "┬", "┐" },
+        { "◢", "◣", "◤", "◥" },
+        { "◰", "◳", "◲", "◱" },
+        { "◴", "◷", "◶", "◵" },
+        { "◐", "◓", "◑", "◒" },
+        { "|", "/", "-", "\\" },
+        { "◡◡", "◡⊙", "⊙⊙", "⊙◠", "◠◠" },
+        { "◜ ", " ◝", " ◞", "◟ " },
+        { "◇", "◈", "◆" },
+        { "⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷" },
+        { ">))'>    ", " >))'>   ", "  >))'>  ", "   >))'> ", "    >))'>", "   <'((<", "  <'((< ", " <'((<  ", "<'((<    " },
+        {
+            "▰▱▱▱▱▱▱▱▱▱", "▱▰▱▱▱▱▱▱▱▱", "▱▱▰▱▱▱▱▱▱▱", "▱▱▱▰▱▱▱▱▱▱", "▱▱▱▱▰▱▱▱▱▱", "▱▱▱▱▱▰▱▱▱▱", "▱▱▱▱▱▱▰▱▱▱", "▱▱▱▱▱▱▱▰▱▱", "▱▱▱▱▱▱▱▱▰▱", "▱▱▱▱▱▱▱▱▱▰",
+            "▱▱▱▱▱▱▱▱▰▱", "▱▱▱▱▱▱▱▰▱▱", "▱▱▱▱▱▱▰▱▱▱", "▱▱▱▱▱▰▱▱▱▱", "▱▱▱▱▰▱▱▱▱▱", "▱▱▱▰▱▱▱▱▱▱", "▱▱▰▱▱▱▱▱▱▱", "▱▰▱▱▱▱▱▱▱▱", "▰▱▱▱▱▱▱▱▱▱",
+        },
+        { "▉▊▋▌▍▎▏▎▍▌▋▊▉", "▌▍▎▏▎▍▌▋▊▉▊▋▌▍", "▎▏▎▍▌▋▊▉▊▋▌▍▎▏", "▍▌▋▊▉▊▋▌▍▎▏▎▍▌", "▋▊▉▊▋▌▍▎▏▎▍▌▋▊", "▊▉▊▋▌▍▎▏▎▍▌▋▊▉", "▉▊▋▌▍▎▏▎▍▌▋▊▉▊" },
+        {
+            "█▁▁▁▁▁▁▁▁▁", "▁█▁▁▁▁▁▁▁▁", "▁▁█▁▁▁▁▁▁▁", "▁▁▁█▁▁▁▁▁▁", "▁▁▁▁█▁▁▁▁▁", "▁▁▁▁▁█▁▁▁▁", "▁▁▁▁▁▁█▁▁▁", "▁▁▁▁▁▁▁█▁▁", "▁▁▁▁▁▁▁▁█▁", "▁▁▁▁▁▁▁▁▁█",
+            "▁▁▁▁▁▁▁▁█▁", "▁▁▁▁▁▁▁█▁▁", "▁▁▁▁▁▁█▁▁▁", "▁▁▁▁▁█▁▁▁▁", "▁▁▁▁█▁▁▁▁▁", "▁▁▁█▁▁▁▁▁▁", "▁▁█▁▁▁▁▁▁▁", "▁█▁▁▁▁▁▁▁▁", "█▁▁▁▁▁▁▁▁▁",
+        },
+        {
+            "100000000", "010000000", "001000000", "000100000", "000010000", "000001000", "000000100", "000000010", "000000001",
+            "000000010", "000000100", "000001000", "000010000", "000100000", "001000000", "010000000", "100000000",
+        },
+        {
+            "▓░░░░░░░░", "░▓░░░░░░░", "░░▓░░░░░░", "░░░▓░░░░░", "░░░░▓░░░░", "░░░░░▓░░░", "░░░░░░▓░░", "░░░░░░░▓░", "░░░░░░░░▓",
+            "░░░░░░░▓░", "░░░░░░▓░░", "░░░░░▓░░░", "░░░░▓░░░░", "░░░▓░░░░░", "░░▓░░░░░░", "░▓░░░░░░░", "▓░░░░░░░░",
+        },
+        {
+            "*         ", " *        ", "  *       ", "   *      ", "    *     ", "     *    ", "      *   ", "       *  ", "        * ", "         *", "          ",
+            "         *", "        * ", "       *  ", "      *   ", "     *    ", "    *     ", "   *      ", "  *       ", " *        ", "*         "
+        },
+        { "o         ", " 0        ", "  o       ", "   0      ", "    o     ", "     0    ", "      o   ", "       0  ", "        o ", "         0", "        o ", "       0  ", "      o   ", "     0    ", "    o     ", "   0      ", "  o       ", " 0        ", "o         ", },
+        { "|         ", " /        ", "  -       ", "   \\      ", "    |     ", "     /    ", "      -   ", "       \\  ", "        | ", "         /", "        - ", "       \\  ", "      |   ", "     /    ", "    -     ", "   \\      ", "  |       ", " /        ", "|         ", },
+        { "▁         ", " ▂        ", "  ▃       ", "   ▄      ", "    ▅     ", "     ▆    ", "      ▇   ", "       █  ", "        ▇ ", "         ▆", "        ▅ ", "       ▄  ", "      ▃   ", "     ▂    ", "    ▁     ", "   ▂      ", "  ▃       ", " ▄        ", "▅         ", },
+        { "|         ", " ||       ", "  |||     ", "   ||||   ", "    ||||| ", "     ||||", "     |||| ", "      ||| ", "       || ", "        | ", "       || ", "      ||| ", "     |||| ", "    ||||| ", "   ||||   ", "  |||     ", " |||      ", "|||       ", "||        ", "|         ", },
+        {
+            "         ",
+            "=        ",
+            "==       ",
+            "===      ",
+            "====     ",
+            "=====    ",
+            "======   ",
+            "=======  ",
+            "======== ",
+            "=========",
+            " ========",
+            "  =======",
+            "   ======",
+            "    =====",
+            "     ====",
+            "      ===",
+            "       ==",
+            "        =",
+            "         ",
+            "        =",
+            "       ==",
+            "      ===",
+            "     ====",
+            "    =====",
+            "   ======",
+            "  =======",
+            " ========",
+            "=========",
+            "======== ",
+            "=======  ",
+            "======   ",
+            "=====    ",
+            "====     ",
+            "===      ",
+            "==       ",
+            "=        ",
+            "         "
+        },
+
+        {0}
+    };
+
+    static int spinner_index = 0, spinner_frame = 0;
+
+    const char *current_frame = SPINNERS[spinner_index][spinner_frame];
+
+    //if null, skip this spinner
+    if (current_frame == nullptr) {
+        spinner_frame = 0;
+        spinner_index = (spinner_index + 1) % (sizeof(SPINNERS) / sizeof(SPINNERS[0]) - 1);
+        current_frame = SPINNERS[spinner_index][spinner_frame];
+    }
+
+    [OFStdOut writeFormat: @"\033[2K%@ [%s]\r", text, current_frame];
+
+    spinner_frame = (spinner_frame + 1) % (sizeof(SPINNERS[0]) / sizeof(SPINNERS[0][0]) - 1);
+
+    if (spinner_frame == 0)
+        spinner_index = (spinner_index + 1) % (sizeof(SPINNERS) / sizeof(SPINNERS[0]) - 1);
+}
 
 @interface ThorCLI : OFObject<OFApplicationDelegate> @end
 
@@ -79,7 +186,7 @@
 
 - (OFNumber *)infoWithArguments: (OFDictionary<OFString *, id> *)args
 {
-    auto search = [$assert_type(args[@"mod"], OFString) lowercaseString];
+    auto search = $assert_type(args[@"mod"], OFString).lowercaseString;
     auto community = [Thor communityWithSlug: $assert_type(args[@"community"], OFString)];
 
     bool showVersions = args[@"versions"] != nil;
@@ -119,11 +226,34 @@
         [Thor updateDatabase];
 
         if (fetchMods) {
+            auto promises = [OFMutableArray<Promise<OFArray<TSMod *> *> *> array];
+
             [OFStdOut writeLine: @"Fetching mods..."];
             for (TSCommunity *community in Thor.communities) {
                 [OFStdOut writeFormat: @"- Fetching mods for %@...\n", community.name];
-                [community mods];
+                [promises addObject: [community fetchModsAsync]];
             }
+
+            auto time = [OFDate date];
+            //turn off cursor
+            [OFStdOut writeFormat: @"\033[?25l"];
+            [OFStdOut writeLine: @"Waiting for mods to be fetched..."];
+            while (true) {
+                size_t waitingFor = 0;
+                for (Promise<OFArray<TSMod *> *> *promise in promises) {
+                    if (!promise.isResolved)
+                        waitingFor++;
+                }
+                LoadingAnimation([OFString stringWithFormat: @"Loading (%ld seconds elapsed, %zu/%zu (%.2f%%) fetched)...", (unsigned long)time.timeIntervalSinceNow * -1, promises.count - waitingFor, promises.count, ((float)(promises.count - waitingFor) / (float)promises.count) * 100.0f]);
+
+                if (waitingFor == 0)
+                    break;
+
+                [OFThread sleepForTimeInterval: 0.1];
+            }
+
+            //turn on cursor
+            [OFStdOut writeFormat: @"\033[?25h"];
         }
     } else if ([scope isEqual: @"mods"]) {
         [OFStdOut writeLine: @"Updating mods..."];
@@ -142,6 +272,9 @@
     [OFStdOut writeFormat: @"%@\n", args];
 
     OFNumber *code = executeCommands(args, @"profile-action", (struct CommandInformation []) {
+        { .name = @"delete", .selector = @selector(deleteProfileWithArguments:), .object = self },
+        { .name = @"list", .selector = @selector(listProfilesWithArguments:), .object = self },
+        { .name = @"create", .selector = @selector(createProfileWithArguments:), .object = self },
         {0}
     });
 

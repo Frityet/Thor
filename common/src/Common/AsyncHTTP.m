@@ -22,7 +22,6 @@
 
 - (instancetype)initWithGETRequest:(OFIRI *)url withHeaders: (OFDictionary<OFString *, OFString *> *)headers reportProgress: (void (^)(size_t))recb
 {
-    //`self` is alloc'd not `init`ed, so might be UB
     self->_reportProgress = recb;
 
     return [super initWithBlock: ^id {

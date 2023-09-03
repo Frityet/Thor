@@ -5,6 +5,8 @@
 
 #import "TSCommunityCategory.h"
 
+#import "Common/AsyncHTTP.h"
+
 OF_ASSUME_NONNULL_BEGIN
 
 @interface TSCommunityNotFoundException : OFException
@@ -16,7 +18,7 @@ OF_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface TSCommunity : OFObject<ITSModel>
+@interface TSCommunity : OFObject<ITSModel, OFHTTPClientDelegate>
 
 @property(atomic, readonly) OFString *identifier;
 @property(atomic, readonly) OFString *name;
@@ -30,6 +32,7 @@ OF_ASSUME_NONNULL_BEGIN
 + (instancetype)communityFromIdentifier: (OFString *)identifier;
 - (instancetype)initFromIdentifier: (OFString *)identifier;
 
+- (Promise<OFArray<TSMod *> *> *)fetchModsAsync;
 - (TSMod *)modWithAuthor: (OFString *)ns name: (OFString *)name;
 
 @end

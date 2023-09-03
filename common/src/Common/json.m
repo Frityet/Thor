@@ -9,8 +9,6 @@
 - (instancetype)initWithKey: (OFString *)key
 {
     self = [super init];
-    if (self == nil)
-
 
     _key = key;
 
@@ -32,8 +30,6 @@
 - (instancetype)initWithKey: (OFString *)key expectedType: (Class)expectedType realType: (Class)realType
 {
     self = [super init];
-    if (self == nil)
-
 
     _key = key;
     _expectedType = expectedType;
@@ -54,7 +50,7 @@ id _Nullable getJSONField(OFDictionary *json, OFString *key, Class type)
         @throw [JSONKeyNotFoundException exceptionWithKey: key];
 
     if (value == OFNull.null)
-
+        return nil;
 
     if (![value isKindOfClass:type])
         @throw [JSONTypeMismatchException exceptionWithKey: key expectedType: type realType: [value class]];
