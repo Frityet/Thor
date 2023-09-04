@@ -6,7 +6,7 @@
 - (void)client:(OFHTTPClient *)client didPerformRequest:(OFHTTPRequest *)request response:(OFHTTPResponse *)response exception:(id)exception
 {
     if (exception != nil) @throw exception;
-    //...
+    // ...
 }
 
 - (bool)stream:(OFStream *)stream didReadIntoBuffer:(void *)buffer length:(size_t)length exception:(id)exception
@@ -17,20 +17,20 @@
     return !stream.atEndOfStream;
 }
 
-+ (instancetype)get:(OFIRI *)url withHeaders: (OFDictionary<OFString *, OFString *> *)headers reportProgress:(void (^)(size_t))recb
++ (instancetype)get:(OFIRI *)url withHeaders: (OFDictionary<OFString *, OFString *> *_Nullable)headers reportProgress:(void (^_Nullable)(size_t))recb
 { return [[self alloc] initWithGETRequest: url withHeaders: headers reportProgress: recb]; }
 
-- (instancetype)initWithGETRequest:(OFIRI *)url withHeaders: (OFDictionary<OFString *, OFString *> *)headers reportProgress: (void (^)(size_t))recb
+- (instancetype)initWithGETRequest:(OFIRI *)url withHeaders: (OFDictionary<OFString *, OFString *> *_Nullable)headers reportProgress: (void (^_Nullable)(size_t))recb
 {
-    self->_reportProgress = recb;
+    self->_reportProgress = recb ?: ^(size_t size) {};
 
-    return [super initWithBlock: ^id {
+    return [super initWithBlock: ^{
         auto client = [OFHTTPClient client];
         client.delegate = self;
 
         auto req = [OFHTTPRequest requestWithIRI: url];
         req.method = OFHTTPRequestMethodGet;
-        req.headers = headers;
+        req.headers = headers ?: @{};
 
         auto resp = [client performRequest: req];
 

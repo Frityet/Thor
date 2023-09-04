@@ -145,8 +145,8 @@ OFDictionary<OFString *, id> *parseArguments(lua_State *lua, OFArray<OFString *>
 
     lua_pushlstring(lua, progname.UTF8String, progname.UTF8StringLength);
 
-    OFIRI *homeDir = GetHomeDirectory();
-    lua_pushlstring(lua, homeDir.string.UTF8String, homeDir.string.UTF8StringLength);
+    OFIRI *baseDir = OFSystemInfo.userConfigIRI;
+    lua_pushlstring(lua, baseDir.string.UTF8String, baseDir.string.UTF8StringLength);
 
     i = lua_pcall(lua, 3, 1, 0);
     if (i != LUA_OK)
