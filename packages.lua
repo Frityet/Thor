@@ -3,7 +3,8 @@ package("gnutls")
     set_homepage("https://www.gnutls.org/")
     set_description("GnuTLS is a secure communications library implementing the SSL, TLS and DTLS protocols")
 
-    add_urls("https://www.gnupg.org/ftp/gcrypt/gnutls/v$(version).tar.xz")
+    --https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7/gnutls-3.7.10.tar.xz
+    add_urls("https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7/gnutls-$(version).tar.xz")
     add_versions("3.7.10", "b6e4e8bac3a950a3a1b7bdb0904979d4ab420a81e74de8636dd50b467d36f5a9")
 
     add_deps("autoconf", "automake", "libtool", "pkg-config")
@@ -41,7 +42,7 @@ package("gnutls")
     add_configs("non-suiteb-curves", { description = "Enable curves not in SuiteB.", default = true, type = "boolean" })
     add_configs("libdane", { description = "Build libdane.", default = true, type = "boolean" })
 
-    on_install(function (package)
+    on_install("linux", "macosx", function (package)
         local configs = {}
 
         table.insert(configs, "--disable-valgrind-tests")
@@ -160,7 +161,7 @@ package("objfw-local")
         local objfwcfg = path.join(package:installdir("bin"), "objfw-config")
         local mflags_str = os.iorunv(objfwcfg, {"--cflags", "--cppflags", "--objcflags", (package:config("arc") and "--arc" or "")})
         local mxxflags_str = os.iorunv(objfwcfg, {"--cxxflags", "--cppflags", "--objcflags", (package:config("arc") and "--arc" or "")})
-        local ldflags_str = os.iorunv(objfwcfg, {"--ldflags", "--libs"})
+        local ldflags_str = os.iorunv(objfwcfg, {"--ldflags"})
         table.join2(mflags, mflags_str:split("%s+"))
         table.join2(mxxflags, mxxflags_str:split("%s+"))
         table.join2(ldflags, ldflags_str:split("%s+"))
