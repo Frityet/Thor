@@ -18,11 +18,21 @@ do
 end
 option_end()
 
+option("ssl-library")
+do
+    set_default("openssl")
+    set_values("openssl", "gnutls", "securetransport")
+    set_showmenu(true)
+    set_category("option")
+    set_description("What SSL library ObjFW should use")
+end
+option_end()
+
 add_requires(has_config("use-system-objfw") and "objfw" or "objfw-local", {
     debug = has_config("use-debug-objfw") and is_mode("debug"),
     system = has_config("system-objfw"),
     configs = {
-        tls = true,
+        tls = get_config("ssl-library"),
         shared = is_kind("shared")
     },
     alias = "ofw"

@@ -77,7 +77,8 @@ do
     end
 
     before_build(function (target)
-        os.runv("luac", { "-s", "-o", path.join(target:scriptdir(), "src", "cli.luac"), path.join(target:scriptdir(), "src", "cli.lua") })
+        import("lib.detect.find_tool")
+        os.runv(find_tool("luac", { check = function(tool) os.run("%s -v", tool)  end }).program, { "-s", "-o", path.join(target:scriptdir(), "src", "cli.luac"), path.join(target:scriptdir(), "src", "cli.lua") })
     end)
 end
 target_end()

@@ -20,6 +20,7 @@ local mflags = {
         "-Wenum-conversion",
         "-Wenum-enum-conversion",
         "-Wno-missing-braces",
+        "-fPIC"
     }
 }
 
@@ -27,6 +28,7 @@ local ldflags = {
     release = {},
     debug = {},
     regular = {
+        "-fPIC"
     }
 }
 

@@ -73,6 +73,12 @@ package("objfw-local")
                 end
             end
         end
+
+        if package:dep("openssl") then
+            table.insert(configs, "CPPFLAGS=-I"..package:dep("openssl"):installdir("include"))
+            table.insert(configs, "LDFLAGS=-L"..package:dep("openssl"):installdir("lib"))
+        end
+
         import("package.tools.autoconf").install(package, configs)
 
         local mflags = {}
@@ -81,21 +87,30 @@ package("objfw-local")
         local objfwcfg = path.join(package:installdir("bin"), "objfw-config")
         local mflags_str = os.iorunv(objfwcfg, {"--cflags", "--cppflags", "--objcflags", (package:config("arc") and "--arc" or "")})
         local mxxflags_str = os.iorunv(objfwcfg, {"--cxxflags", "--cppflags", "--objcflags", (package:config("arc") and "--arc" or "")})
-        local ldflags_str = os.iorunv(objfwcfg, {"--ldflags"})
+        local ldflags_str = os.iorunv(objfwcfg, {"--ldflags", "--libs"})
         table.join2(mflags, mflags_str:split("%s+"))
         table.join2(mxxflags, mxxflags_str:split("%s+"))
         table.join2(ldflags, ldflags_str:split("%s+"))
+
+        print("MFlags: ", mflags)
+        print("MXXFlags: ", mxxflags)
+        print("LDFlags: ", ldflags)
         package:add("mflags", mflags)
         package:add("mxxflags", mxxflags)
         package:add("ldflags", ldflags)
+
+        if package:config("runtime") then
+            package:add("links", {"objfw", "objfwrt", (package:config("tls") and "objfwtls" or nil)})
+        else
+            package:add("links", {"objfw", (package:config("tls") and "objfwtls" or nil)})
+        end
     end)
 
     on_test(function (package)
         assert(package:check_msnippets({test = [[
-            #include <stdio.h>
             void test() {
                 OFString* string = @"hello";
-                printf("%s\n", [string UTF8String]);
+                [OFStdOut writeLine: string];
             }
         ]]}, {includes = {"ObjFW/ObjFW.h"}}))
     end)
