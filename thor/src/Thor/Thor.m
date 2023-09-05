@@ -1,6 +1,9 @@
 #include "Thor.h"
 
+#include <dlfcn.h>
+
 #include "Thor/Cache/TSCache.h"
+
 
 @implementation Thor
 
@@ -14,10 +17,10 @@
         file = [TSCache.sharedCache createFileNamed: @"communities"];
         auto resp = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: $assert_nonnil(TSCommunity.url)]];
         [file writeString: resp];
-        json = resp.objectByParsingJSON;
+        json = ParseJSON(resp);
     } else {
         auto data = [OFString stringWithData: $assert_nonnil([file readDataUntilEndOfStream]) encoding: OFStringEncodingUTF8];
-        json = data.objectByParsingJSON;
+        json = ParseJSON(data);
     }
 
     json = json[@"results"];

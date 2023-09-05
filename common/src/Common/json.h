@@ -1,4 +1,5 @@
 #include "ObjFW.h"
+#include "macros.h"
 
 OF_ASSUME_NONNULL_BEGIN
 
@@ -20,8 +21,18 @@ OF_ASSUME_NONNULL_BEGIN
 
 @end
 
-id _Nullable getJSONField(OFDictionary *json, OFString *key, Class type);
+@interface JSONParseException : OFException
 
-#define $json_field(json, key, type) ((type *_Nullable)getJSONField(json, key, [type class]))
++ (instancetype)exceptionWithErrorCode: (int)errorCode;
+- (instancetype)initWithErrorCode: (int)errorCode;
+
+@end
+
+
+$nomangle id _Nullable GetJSONField(OFDictionary *json, OFString *key, Class type);
+
+$nomangle OFDictionary<OFString *, id> *ParseJSON(OFString *json);
+
+#define $json_field(json, key, type) ((type *_Nullable)GetJSONField(json, key, [type class]))
 
 OF_ASSUME_NONNULL_END

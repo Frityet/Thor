@@ -53,7 +53,7 @@
             "name": "Update",
             "program": "${workspaceFolder}/build/macosx/x86_64/debug/thorcli",
             "args": [
-                "update", "database", "-f"
+                "update", "-f"
             ],
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build",

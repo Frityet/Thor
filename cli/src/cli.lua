@@ -2199,6 +2199,11 @@ function ParseArguments(args, program_name, home_dir)
                 args = 0
             }
 
+            cmd:option {
+                name = "-j --multi-threaded",
+                description = "use the UNSTABLE multi-threaded downloader",
+                args = 0
+            }
 
             cmd:option {
                 name = "-c --community",

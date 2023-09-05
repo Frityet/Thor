@@ -67,7 +67,7 @@
     if (![OFFileManager.defaultManager fileExistsAtIRI: manifestFile])
         @throw [OFInvalidArgumentException exception];
 
-    OFDictionary *manifest = [OFString stringWithContentsOfIRI: manifestFile].objectByParsingJSON;
+    OFDictionary *manifest = ParseJSON([OFString stringWithContentsOfIRI: manifestFile]);
 
     return [[self alloc] initProfileWithName: $json_field(manifest, @"name", OFString)
                                         game: $json_field(manifest, @"game", OFString)

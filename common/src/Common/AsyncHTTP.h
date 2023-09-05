@@ -1,5 +1,7 @@
 #import "Promise.h"
 
+OF_ASSUME_NONNULL_BEGIN
+
 @interface AsyncHTTP : Promise<OFData *><OFHTTPClientDelegate, OFStreamDelegate>
 
 @property(readonly) void (^reportProgress)(size_t size);
@@ -8,3 +10,5 @@
 - (instancetype)initWithGETRequest: (OFIRI *)url withHeaders: (OFDictionary<OFString *, OFString *> *_Nullable)headers reportProgress: (void(^_Nullable)(size_t size))recb;
 
 @end
+
+OF_ASSUME_NONNULL_END

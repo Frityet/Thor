@@ -32,6 +32,9 @@ OF_ASSUME_NONNULL_BEGIN
 + (instancetype)communityFromIdentifier: (OFString *)identifier;
 - (instancetype)initFromIdentifier: (OFString *)identifier;
 
+/**
+ * Fetches the community's mods from the server, does not parse them.
+*/
 - (Promise<OFArray<TSMod *> *> *)fetchModsAsync;
 - (TSMod *)modWithAuthor: (OFString *)ns name: (OFString *)name;
 

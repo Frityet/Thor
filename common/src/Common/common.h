@@ -1,4 +1,5 @@
-#import "json.h"
 #import "macros.h"
 #import "ObjFW.h"
 #import "Version.h"
+#import "InvalidTypeException.h"
+#import "json.h"

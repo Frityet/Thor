@@ -46,12 +46,15 @@ do
     add_packages(packages)
 
     add_files("src/**.m")
+    add_files("src/**.mm")
+    add_files("src/Common/simdjson.cpp")
     add_headerfiles("src/**.h")
     -- set_pmheader("src/Common/common.h")
 
     add_includedirs("src/", { public = true })
 
     add_mxflags(mflags.regular)
+    add_cxxflags("-O3", "-march=native")
     add_mxxflags("-fexceptions", "-fobjc-exceptions", "-funwind-tables", "-fconstant-string-class=OFConstantString", "-Xclang", "-fno-constant-cfstrings", "-fblocks", "-fobjc-arc", "-fobjc-arc-exceptions")
     add_ldflags(ldflags.regular)
 

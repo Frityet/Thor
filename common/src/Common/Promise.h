@@ -9,8 +9,6 @@
 
 @property (atomic, readonly) bool isResolved;
 @property (readonly) bool isBlock;
-@property (readonly) T (^block)(void);
-@property (readonly) T (*function)(void);
 
 
 + (instancetype)promiseWithBlock: (T (^)(void))block;
@@ -22,5 +20,3 @@
 - (T)await;
 
 @end
-
-

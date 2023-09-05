@@ -9,7 +9,6 @@
 - (instancetype)initWithBlock: (id (^)(void))block
 {
     self = [super init];
-    _block = block;
     _isBlock = true;
 
     //Run the promise on a new thread
@@ -29,7 +28,6 @@
 - (instancetype)initWithFunction: (id (*)(void))function
 {
     self = [super init];
-    _function = function;
     _isBlock = false;
 
     //Run the promise on a new thread
@@ -47,7 +45,6 @@
 {
     auto promise = [[self alloc] init];
     promise->_value = value;
-    promise->_isBlock = false;
     promise->_isResolved = true;
     return promise;
 }

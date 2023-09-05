@@ -4,9 +4,6 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
-#include "ObjFW/OFString.h"
-#import "utilities.h"
-
 static const uint8_t LUA_CODE[] = {
 #   include "cli.luac.h"
 };

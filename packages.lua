@@ -3,7 +3,6 @@ package("gnutls")
     set_homepage("https://www.gnutls.org/")
     set_description("GnuTLS is a secure communications library implementing the SSL, TLS and DTLS protocols")
 
-    --https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7/gnutls-3.7.10.tar.xz
     add_urls("https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7/gnutls-$(version).tar.xz")
     add_versions("3.7.10", "b6e4e8bac3a950a3a1b7bdb0904979d4ab420a81e74de8636dd50b467d36f5a9")
 
@@ -43,6 +42,7 @@ package("gnutls")
     add_configs("libdane", { description = "Build libdane.", default = true, type = "boolean" })
 
     on_install("linux", "macosx", function (package)
+        --[[@cast package Package]]
         local configs = {}
 
         table.insert(configs, "--disable-valgrind-tests")
@@ -61,7 +61,10 @@ package("gnutls")
             end
         end
 
-        import("package.tools.autoconf").install(package, configs)
+        local autoconf = import("package.tools.autoconf")
+        local envs = autoconf.buildenvs(package)
+        io.save(path.join(package:scriptdir(), "xmake.envs"), envs)
+        autoconf.install(package, configs)
     end)
 
 package_end()
@@ -117,10 +120,8 @@ package("objfw-local")
             if tls == "openssl" then
                 package:add("deps", "openssl")
             elseif tls == "securetransport" then
-                package:add("frameworks", "Security")
+                -- package:add("frameworks", "Security")
             elseif tls == "gnutls" then
-                --gnutls is not on xrepo so just add links
-                -- package:add("links", "gnutls")
                 package:add("deps", "gnutls")
             end
         end
@@ -148,9 +149,32 @@ package("objfw-local")
 
         -- SecureTransport must be handled by system so we don't worry about providing CFLAGS and LDFLAGS
         local ssl = package:dep("openssl") or package:dep("gnutls")
+        local is_gnu = ssl and ssl:name() == "gnutls"
         if ssl then
-            table.insert(configs, "CPPFLAGS=-I"..ssl:installdir("include"))
-            table.insert(configs, "LDFLAGS=-L"..ssl:installdir("lib"))
+            import("lib.detect.find_library")
+            import("lib.detect.find_path")
+
+            local libssl = find_library(is_gnu and "gnutls" or "ssl", { ssl:installdir("lib"), "/usr/lib/", "/usr/lib64/", "/usr/local/lib" })
+            if not libssl then
+                libssl = find_library(is_gnu and "gnutls" or "ssl")
+            end
+
+            local ssl_incdir do
+                -- if ssl:name() == "gnutls" then
+                --     ssl_incdir = find_path("gnutls/gnutls.h", { ssl:installdir("include"), "/usr/include/", "/usr/local/include" })
+                -- else
+                --     ssl_incdir = find_path("openssl/ssl.h", { ssl:installdir("include"), "/usr/include/", "/usr/local/include" })
+                -- end
+                ssl_incdir = find_path(is_gnu and "gnutls/gnutls.h" or "openssl/ssl.h", { ssl:installdir("include"), "/usr/include/", "/usr/local/include" })
+            end
+
+            if libssl then
+                print("Using SSL "..ssl:name().." from "..libssl.linkdir..", include dir: "..ssl_incdir)
+                table.insert(configs, "CPPFLAGS=-I"..ssl_incdir)
+                table.insert(configs, "LDFLAGS=-L"..libssl.linkdir)
+            else
+                print("No SSL library found, using system default")
+            end
         end
 
         import("package.tools.autoconf").install(package, configs)

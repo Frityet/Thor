@@ -57,6 +57,7 @@ do
     add_ldflags(ldflags.regular)
 
     if is_mode("debug") then
+        add_defines("PROJECT_DEBUG")
         add_mxflags(mflags.debug)
         add_ldflags(ldflags.debug)
 
@@ -65,7 +66,6 @@ do
             add_ldflags("-fsanitize=" .. v)
         end
 
-        add_defines("PROJECT_DEBUG")
     elseif is_mode("release") then
         add_mxflags(mflags.release)
         add_ldflags(ldflags.release)

@@ -20,7 +20,7 @@ option_end()
 
 option("ssl-library")
 do
-    set_default("openssl")
+    set_default(is_plat("macosx") and "securetransport" or "openssl")
     set_values("openssl", "gnutls", "securetransport")
     set_showmenu(true)
     set_category("option")

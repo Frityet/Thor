@@ -22,7 +22,7 @@
 
 - (instancetype)initWithGETRequest:(OFIRI *)url withHeaders: (OFDictionary<OFString *, OFString *> *_Nullable)headers reportProgress: (void (^_Nullable)(size_t))recb
 {
-    self->_reportProgress = recb ?: ^(size_t size) {};
+    self->_reportProgress = recb ?: ^(size_t) {};
 
     return [super initWithBlock: ^{
         auto client = [OFHTTPClient client];
