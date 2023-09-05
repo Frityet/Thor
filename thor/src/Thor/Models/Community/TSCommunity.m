@@ -190,7 +190,7 @@
                 #endif
 
                 auto data = $assert_nonnil([file readDataUntilEndOfStream]);
-                auto json = (OFArray *)ParseJSON([OFString stringWithData: data encoding: OFStringEncodingUTF8]);
+                auto json = $assert_type(ParseJSON([OFString stringWithData: data encoding: OFStringEncodingUTF8]), OFArray<OFDictionary *>);
 
                 #if PROJECT_DEBUG
                 [OFStdOut writeFormat: @"\rParsed %@ (%d entries) from cache as JSON (size: %zu) in %f seconds.\n", fname, json.count, data.count * data.itemSize, date.timeIntervalSinceNow * -1];

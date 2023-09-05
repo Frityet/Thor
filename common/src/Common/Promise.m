@@ -1,5 +1,5 @@
 #include "Promise.h"
-#include "common.h"
+#import "common.h"
 
 @implementation Promise
 

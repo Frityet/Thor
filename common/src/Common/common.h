@@ -2,4 +2,6 @@
 #import "ObjFW.h"
 #import "Version.h"
 #import "InvalidTypeException.h"
+#import "OFObject+AllocatorExtensions.h"
+#import "FastPoolAllocator.h"
 #import "json.h"

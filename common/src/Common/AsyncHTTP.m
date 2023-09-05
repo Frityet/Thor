@@ -1,5 +1,5 @@
 #include "AsyncHTTP.h"
-#include "common.h"
+#import "common.h"
 
 @implementation AsyncHTTP
 

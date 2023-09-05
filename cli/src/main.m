@@ -1,11 +1,12 @@
-#include "Common/common.h"
+#import "Common/common.h"
+#include "ObjFW/OFApplication.h"
 
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
-#include "Thor/Thor.h"
+#import "Thor/Thor.h"
 
-#include "ArgumentParsing.h"
+#import "ArgumentParsing.h"
 
 static void LoadingAnimation(OFString *text)
 {
@@ -302,6 +303,15 @@ static void LoadingAnimation(OFString *text)
 
 - (void)applicationDidFinishLaunching: (OFNotification*)notification
 {
+    auto alloc = [FastPoolAllocator allocator];
+
+    auto arr = [[OFMutableArray<OFString *> allocWithAllocator: alloc] init];
+
+    for (size_t i = 0; i < 100000; i++) {
+        [arr addObject: [[OFString allocWithAllocator: alloc] initWithFormat: @"%zu", i]];
+    }
+
+    [OFApplication terminate];
     auto lua = luaL_newstate();
     luaL_openlibs(lua);
     auto arguments = parseArguments(lua, $assert_nonnil(OFApplication.arguments), $assert_nonnil(OFApplication.programName));

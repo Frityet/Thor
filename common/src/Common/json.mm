@@ -1,31 +1,10 @@
 //uses C++ `auto` so include it first
 #include "simdjson.hpp"
 
-#include "json.h"
-#include "macros.h"
-#include "InvalidTypeException.h"
+#import "json.h"
+#import "macros.h"
 
-
-@implementation JSONKeyNotFoundException
-
-+ (instancetype)exceptionWithKey: (OFString *)key
-{ return [[self alloc] initWithKey: key]; }
-
-- (instancetype)initWithKey: (OFString *)key
-{
-    self = [super init];
-
-    _key = key;
-
-    return self;
-}
-
-- (OFString *)description
-{ return [OFString stringWithFormat: @"Key not found: %@", _key]; }
-
-@end
-
-@implementation JSONTypeMismatchException
+@implementation JSONInvalidTypeException
 
 + (instancetype)exceptionWithKey: (OFString *)key expectedType: (Class)expectedType realType: (Class)realType
 {
@@ -34,17 +13,15 @@
 
 - (instancetype)initWithKey: (OFString *)key expectedType: (Class)expectedType realType: (Class)realType
 {
-    self = [super init];
+    self = [super initWithExpectedType: expectedType actualType: realType];
 
     _key = key;
-    _expectedType = expectedType;
-    _realType = realType;
 
     return self;
 }
 
 - (OFString *)description
-{ return [OFString stringWithFormat: @"Type mismatch: the value of %@ is not a %@ (real type: %@)", _key, _expectedType, _realType]; }
+{ return [OFString stringWithFormat: @"Expected type %@ for key %@, got %@", self.expectedType, self.key, self.actualType]; }
 
 @end
 
@@ -72,17 +49,12 @@
 
 $nomangle id _Nullable GetJSONField(OFDictionary *json, OFString *key, Class type)
 {
-    $assert_type(json, OFDictionary);
-
     id value = json[key];
-    if (value == nil)
-        @throw [JSONKeyNotFoundException exceptionWithKey: key];
-
-    if (value == OFNull.null)
+    if (value == nil or value == OFNull.null)
         return nil;
 
     if (![value isKindOfClass:type])
-        @throw [JSONTypeMismatchException exceptionWithKey: key expectedType: type realType: [value class]];
+        @throw [JSONInvalidTypeException exceptionWithKey: key expectedType: type realType: [value class]];
 
     return value;
 }

@@ -1,21 +1,13 @@
-#include "ObjFW.h"
-#include "macros.h"
+#import "ObjFW.h"
+#import "macros.h"
+
+#import "InvalidTypeException.h"
 
 OF_ASSUME_NONNULL_BEGIN
 
-@interface JSONKeyNotFoundException : OFException
+@interface JSONInvalidTypeException : InvalidTypeException
 
 @property (readonly, nonatomic) OFString *key;
-
-+ (instancetype)exceptionWithKey: (OFString *)key;
-
-@end
-
-@interface JSONTypeMismatchException : OFException
-
-@property (readonly, nonatomic) OFString *key;
-@property (readonly, nonatomic) Class expectedType;
-@property (readonly, nonatomic) Class realType;
 
 + (instancetype)exceptionWithKey: (OFString *)key expectedType: (Class)expectedType realType: (Class)realType;
 

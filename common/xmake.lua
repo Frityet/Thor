@@ -1,5 +1,6 @@
 --Config:
 local packages = {
+    "boost"
 }
 
 local sanitizers = { }
@@ -38,7 +39,7 @@ set_languages {
 
 add_rules("mode.debug", "mode.release")
 
-add_requires(packages, { configs = { shared = true }, system = false })
+add_requires(packages, { configs = { shared = false }, system = false })
 
 target("Common")
 do
