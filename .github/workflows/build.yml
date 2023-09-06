@@ -20,6 +20,6 @@ jobs:
       - name: Run tests
         run: |
           xmake --version
-          xmake create -P test
-          xmake build -P test
-          xmake run -P test
+          xmake config -v -y --mode=debug --toolchain=clang
+          xmake -vw
+          xmake run ThorCLI -- update -f
