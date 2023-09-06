@@ -1,7 +1,6 @@
 #include "OFObject+AllocatorExtensions.h"
 
-#include <objc/objc.h>
-#include <objc/objc-class.h>
+extern size_t class_getInstanceSize(Class _Nullable cls);
 
 @implementation OFObject(AllocatorExtensions)
 
