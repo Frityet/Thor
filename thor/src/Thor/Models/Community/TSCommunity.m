@@ -135,11 +135,16 @@
             #endif
 
             OFString *resp = ({
+
+            #if defined(USE_GZIPPED_MOD_GET)
                 OFHTTPResponse *data = HTTPGet(url, @{ @"Accept-Encoding": @"gzip" });
 
                 auto stream = [OFGZIPStream streamWithStream: data mode: @"r"];
 
                 [OFString stringWithData: [stream readDataUntilEndOfStream] encoding: OFStringEncodingUTF8];
+            #else
+                [OFString stringWithContentsOfIRI: url];
+            #endif
             });
 
             file = [TSCache.sharedCache createFileNamed: fname];
