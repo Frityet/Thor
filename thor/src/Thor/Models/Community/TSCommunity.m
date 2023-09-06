@@ -1,9 +1,10 @@
 #include "TSCommunity.h"
 #include "ObjFW/OFStdIOStream.h"
 #import "Thor/Cache/TSCache.h"
+#include <ObjFW/OFString.h>
 
 #import "Common/Promise.h"
-#import "Common/AsyncHTTP.h"
+#import "Common/HTTP.h"
 
 @implementation TSCommunityNotFoundException
 
@@ -56,12 +57,7 @@
 
 - (instancetype)initFromIdentifier:(OFString *)identifier
 {
-    OFString *contents;
-    @try {
-        contents = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [TSCommunity urlWithParametres: @{ @"community": identifier }]]];
-    } @catch(OFException *) {
-        contents = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [TSCommunity urlWithParametres: @{ @"community": identifier, @"new": @"" }]]];
-    }
+    OFString *contents = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [TSCommunity urlWithParametres: @{ @"community": identifier }]]];
 
     return [self initWithJSON: (OFDictionary *)ParseJSON(contents)];
 }
@@ -70,14 +66,7 @@
 { return @"https://thunderstore.io/api/experimental/community/"; }
 
 + (OFString *)urlWithParametres:(OFDictionary<OFString *,OFString *> *)params
-{
-    auto newFmt = params[@"new"] != nil;
-
-    if (newFmt)
-        return [OFString stringWithFormat: @"https://thunderstore.io/c/%@/api/experimental/current-community/", params[@"community"]];
-    else
-        return [OFString stringWithFormat: @"https://%@.thunderstore.io/api/experimental/current-community/", params[@"community"]];
-}
+{ return [OFString stringWithFormat: @"https://thunderstore.io/c/%@/api/experimental/current-community/", params[@"community"]]; }
 
 - (OFArray<TSCommunityCategory *> *)categories
 {
@@ -86,7 +75,7 @@
         auto fname = [OFString stringWithFormat: @"%@.categories", self.identifier];
         auto file = TSCache.sharedCache[fname];
         if (file != nil) {
-            auto json = (OFDictionary *)ParseJSON([OFString stringWithData: $assert_nonnil([file readDataUntilEndOfStream]) encoding: OFStringEncodingUTF8]);
+            auto json = $assert_type(ParseJSON([OFString stringWithData: $assert_nonnil([file readDataUntilEndOfStream]) encoding: OFStringEncodingUTF8]), OFDictionary);
 
             auto results = $assert_nonnil($json_field(json, @"results", OFArray<OFDictionary *>));
 
@@ -95,7 +84,7 @@
                 [self->_categories addObject: [TSCommunityCategory modelFromJSON: result]];
         } else {
             auto resp = [OFString stringWithContentsOfIRI: [OFIRI IRIWithString: [TSCommunityCategory urlWithParametres: @{ @"community": self.identifier }]]];
-            auto json = (OFDictionary *)ParseJSON(resp);
+            auto json = $assert_type(ParseJSON(resp), OFDictionary);
             file = [TSCache.sharedCache createFileNamed: fname];
             [file writeString: resp];
 
@@ -124,7 +113,10 @@
             auto date = [OFDate date];
             #endif
 
-            auto json = (OFArray *)[OFString stringWithData: $assert_nonnil([file readDataUntilEndOfStream]) encoding: OFStringEncodingUTF8].objectByParsingJSON;
+            auto json = ({
+                auto str = [OFString stringWithData: $assert_nonnil([file readDataUntilEndOfStream]) encoding: OFStringEncodingUTF8];
+                $assert_type(ParseJSON(str), OFArray<OFDictionary *>);
+            });
 
             #if PROJECT_DEBUG
             [OFStdOut writeFormat: @"\rParsed %@ (%d entries) from cache as JSON in %f seconds.\n", fname, json.count, date.timeIntervalSinceNow * -1];
@@ -142,25 +134,21 @@
             auto date = [OFDate date];
             #endif
 
-            OFString *resp;
-            OFArray<OFDictionary *> *json;
-            @try {
-                resp = [OFString stringWithContentsOfIRI: url];
-                #if PROJECT_DEBUG
-                [OFStdOut writeFormat: @"Downloaded %@ in %f seconds.\n", fname, date.timeIntervalSinceNow * -1];
-                #endif
-                json = $assert_type(resp.objectByParsingJSON, OFArray<OFDictionary *>);
-            } @catch(OFException *) {
-                url = [OFIRI IRIWithString: [TSMod urlWithParametres: @{ @"community": self.identifier, @"new": @"" }]];
-                resp = [OFString stringWithContentsOfIRI: url];
-                #if PROJECT_DEBUG
-                [OFStdOut writeFormat: @"Downloaded %@ in %f seconds.\n", fname, date.timeIntervalSinceNow * -1];
-                #endif
-                json = $assert_type(resp.objectByParsingJSON, OFArray<OFDictionary *>);
-            }
+            OFString *resp = ({
+                OFHTTPResponse *data = HTTPGet(url, @{ @"Accept-Encoding": @"gzip" });
+
+                auto stream = [OFGZIPStream streamWithStream: data mode: @"r"];
+
+                [OFString stringWithData: [stream readDataUntilEndOfStream] encoding: OFStringEncodingUTF8];
+            });
 
             file = [TSCache.sharedCache createFileNamed: fname];
             [file writeString: resp];
+
+            #if PROJECT_DEBUG
+            [OFStdOut writeFormat: @"Downloaded %@ in %f seconds.\n", fname, date.timeIntervalSinceNow * -1];
+            #endif
+            auto json = $assert_type(ParseJSON(resp), OFArray<OFDictionary *>);
 
             self->_mods = [OFMutableArray<TSMod *> arrayWithCapacity: json.count];
             for (OFDictionary *result in json)

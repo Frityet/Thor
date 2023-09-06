@@ -45,7 +45,7 @@
 { return nil; }
 
 + (OFString *)urlWithParametres:(OFDictionary<OFString *, OFString *> *)params
-{ return [OFString stringWithFormat: @"https://%@.thunderstore.io/api/experimental/package/%@/%@/%@/", params[@"community"], params[@"author"], params[@"name"], params[@"version"]]; }
+{ return [OFString stringWithFormat: @"https://thunderstore.io/c/%@/api/experimental/package/%@/%@/%@/", params[@"community"], params[@"author"], params[@"name"], params[@"version"]]; }
 
 - (OFString *)description
 { return [OFString stringWithFormat: @"<TSModVersion: %@>", self.fullName]; }

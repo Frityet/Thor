@@ -41,7 +41,7 @@ set_languages {
 
 add_rules("mode.debug", "mode.release")
 
-add_requires(packages, { debug = is_mode("debug"), configs = { shared = is_kind("shared") }, system = false })
+add_requires(packages, { debug = false, configs = { shared = false }, system = false })
 
 
 target("ThorCLI")

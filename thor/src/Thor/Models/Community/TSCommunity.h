@@ -5,7 +5,7 @@
 
 #import "TSCommunityCategory.h"
 
-#import "Common/AsyncHTTP.h"
+#import "Common/HTTP.h"
 
 OF_ASSUME_NONNULL_BEGIN
 

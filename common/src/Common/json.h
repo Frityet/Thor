@@ -23,7 +23,7 @@ OF_ASSUME_NONNULL_BEGIN
 
 $nomangle id _Nullable GetJSONField(OFDictionary *json, OFString *key, Class type);
 
-$nomangle OFDictionary<OFString *, id> *ParseJSON(OFString *json);
+$nomangle id ParseJSON(OFString *json);
 
 #define $json_field(json, key, type) ((type *_Nullable)GetJSONField(json, key, [type class]))
 

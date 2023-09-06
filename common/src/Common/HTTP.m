@@ -1,4 +1,4 @@
-#include "AsyncHTTP.h"
+#include "HTTP.h"
 #import "common.h"
 
 @implementation AsyncHTTP
@@ -42,3 +42,13 @@
 }
 
 @end
+
+OFHTTPResponse *HTTPGet(OFIRI *url, OFDictionary<OFString *, OFString *> *_Nullable headers)
+{
+    auto client = [OFHTTPClient client];
+    auto req = [OFHTTPRequest requestWithIRI: url];
+    req.method = OFHTTPRequestMethodGet;
+    req.headers = headers ?: @{};
+
+    return [client performRequest: req];
+}

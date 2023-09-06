@@ -116,8 +116,9 @@ static id jsonToObject(const simdjson::dom::element &document)
     }
 }
 
-$nomangle OFDictionary<OFString *, id> *ParseJSON(OFString *str)
+$nomangle id ParseJSON(OFString *str)
 {
+    //return [str objectByParsingJSON];
     simdjson::dom::parser parser;
     simdjson::dom::element doc;
     simdjson::error_code err = parser.parse(str.UTF8String, str.UTF8StringLength).get(doc);

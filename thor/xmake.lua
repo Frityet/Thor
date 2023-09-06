@@ -55,9 +55,9 @@ do
 
     add_mxflags(mflags.regular)
     add_ldflags(ldflags.regular)
+        add_defines("PROJECT_DEBUG")
 
     if is_mode("debug") then
-        add_defines("PROJECT_DEBUG")
         add_mxflags(mflags.debug)
         add_ldflags(ldflags.debug)
 

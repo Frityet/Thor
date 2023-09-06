@@ -1,5 +1,4 @@
 #import "Common/common.h"
-#include "ObjFW/OFApplication.h"
 
 #include <lua.h>
 #include <lauxlib.h>
@@ -253,16 +252,23 @@ static void LoadingAnimation(OFString *text)
                 __block OFString *currentlyFetching;
 
                 auto thr = [Promise<OFArray<OFArray<TSMod *> *> *> promiseWithBlock: ^{
-                    auto arr = [OFMutableArray<OFArray<TSMod *> *> array];
+                    @try {
+                        auto arr = [OFMutableArray<OFArray<TSMod *> *> array];
 
-                    for (TSCommunity *community in Thor.communities) {
-                        currentlyFetching = community.name;
-                        [arr addObject: [community mods]];
-                        timer = [OFDate date];
-                        nCompleted++;
+                        for (TSCommunity *community in Thor.communities) {
+                            currentlyFetching = community.name;
+                            [arr addObject: [community mods]];
+                            timer = [OFDate date];
+                            nCompleted++;
+                        }
+
+                        return arr;
+                    } @catch(OFException *ex) {
+                        [OFStdErr writeLine: @"\x1b[31mAn error occured!\x1b[0m"];
+                        [OFStdErr writeFormat: @"\x1b[31m%@: %@\x1b[0m\n", ex.className, ex.description];
+                        [OFStdErr writeFormat: @"Stack trace: \n%@\n", ex.stackTraceSymbols];
+                        [OFApplication terminateWithStatus: 1];
                     }
-
-                    return arr;
                 }];
 
                 while (!thr.isResolved) {
@@ -303,22 +309,15 @@ static void LoadingAnimation(OFString *text)
 
 - (void)applicationDidFinishLaunching: (OFNotification*)notification
 {
-    auto alloc = [FastPoolAllocator allocator];
-
-    auto arr = [[OFMutableArray<OFString *> allocWithAllocator: alloc] init];
-
-    for (size_t i = 0; i < 100000; i++) {
-        [arr addObject: [[OFString allocWithAllocator: alloc] initWithFormat: @"%zu", i]];
-    }
-
-    [OFApplication terminate];
-    auto lua = luaL_newstate();
-    luaL_openlibs(lua);
-    auto arguments = parseArguments(lua, $assert_nonnil(OFApplication.arguments), $assert_nonnil(OFApplication.programName));
-    lua_close(lua);
-
     OFNumber *code;
     @try {
+        auto lua = luaL_newstate();
+        luaL_openlibs(lua);
+        auto arguments = parseArguments(lua, $assert_nonnil(OFApplication.arguments), $assert_nonnil(OFApplication.programName));
+        lua_close(lua);
+
+
+
         code = executeCommands(arguments, @"action", (struct CommandInformation []) {
             { .name = @"list", .selector = @selector(listWithArguments:), .object = self },
             { .name = @"info", .selector = @selector(infoWithArguments:), .object = self },
@@ -330,6 +329,7 @@ static void LoadingAnimation(OFString *text)
         [OFStdErr writeLine: @"\x1b[31mAn error occured!\x1b[0m"];
         [OFStdErr writeFormat: @"\x1b[31m%@: %@\x1b[0m\n", ex.className, ex.description];
         [OFStdErr writeFormat: @"Stack trace: \n%@\n", ex.stackTraceSymbols];
+        [OFApplication terminateWithStatus: 1];
     }
     [OFApplication terminateWithStatus: code.unsignedIntValue];
 }

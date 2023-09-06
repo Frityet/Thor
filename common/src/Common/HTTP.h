@@ -11,4 +11,6 @@ OF_ASSUME_NONNULL_BEGIN
 
 @end
 
+OFHTTPResponse *HTTPGet(OFIRI *url, OFDictionary<OFString *, OFString *> *_Nullable headers);
+
 OF_ASSUME_NONNULL_END
