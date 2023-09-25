@@ -1,2 +1,2 @@
 common/src/Common/simdjson.hpp linguist-vendored
-common/src/Common.simdjson.cpp linguist-vendored
+common/src/Common/simdjson.cpp linguist-vendored
