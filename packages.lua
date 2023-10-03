@@ -75,6 +75,7 @@ package("objfw-local")
 
     add_urls("https://github.com/ObjFW/ObjFW.git")
     add_versions("1.0.0", "8d19ba9c8f1955673569e10919025624975e896f")
+    add_versions("1.0.3", "3d46fe3a7f89bdeeb1def38a3ef1594489949c52")
 
     if is_host("linux", "macosx") then
         add_deps("autoconf", "automake", "libtool")
